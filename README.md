@@ -42,9 +42,8 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
       
 
  - **Access the UI**
- 
-     Now, open your browser and navigate to http://localhost:8080
-     Login with 
+      
+     Login using browser with http://localhost:8080  
      
      - username **admin**
      - password **opsmxadmin123**
