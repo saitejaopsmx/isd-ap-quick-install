@@ -1,5 +1,5 @@
 # isd-ap-quick-install
-Quick install for ISD Services only for Argo
+Quick install for ISD Services only.
 
 
 To experience ISD quickly, you can install it and deploy your applications. Note that the instructions below are intended to get you started quickly and try out ISD functionality. This is not suitable for production or any environment where security is a concern.
@@ -13,7 +13,7 @@ Issue the following commands (copy paste in a terminal window)
 
       kubectl create secret docker-registry opsmx11-secret --docker-server=docker.io --docker-username=opsmx11 --docker-password=xxxxx --docker-email=saiteja.katabhatina@opmx.io
 
-- kubectl -n opsmx-autopilot apply -f https://raw.githubusercontent.com/OpsMx/isd-quick-install/main/isd312/isd-gitea-quick.yaml
+- kubectl -n opsmx-autopilot apply -f https://raw.githubusercontent.com/OpsMx/isd-ap-quick-install/main/ap-without-argo/ap-quickinstall.yaml
 
 WAIT for about 20-30 min, depending your network speed.
 It is normal for some pods to go into error/crashloop before stabilising.
