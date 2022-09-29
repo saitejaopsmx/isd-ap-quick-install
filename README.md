@@ -8,9 +8,6 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
 **This is the ISD Autopilot which supports only for Argo**.
 
 ## Steps to be followed
-- **Clone the repository**
-
-      git clone https://github.com/OpsMx/isd-ap-quick-install.git
 
 - **Namespace will be created automatically**
 
