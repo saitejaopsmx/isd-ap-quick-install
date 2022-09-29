@@ -1,11 +1,9 @@
 # isd-ap-quick-install
 
-**Quick install for ISD Services only.**
+**Quick install for ISD Services only which supports only for Argo**.
 
 To experience ISD quickly, you can install it and deploy your applications. Note that the instructions below are intended to get you started quickly and try out ISD functionality. This is not suitable for production or any environment where security is a concern.
 To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB RAM each) and kubectl set-up.
-
-**This is the ISD Autopilot which supports only for Argo**.
 
 ## Steps to be followed
 
