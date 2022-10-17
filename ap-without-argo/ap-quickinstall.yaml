@@ -90,28 +90,28 @@ stringData:
     databases:
       audit:
         type: postgresql
-        connectString: host=oea-db  user='postgres' password='networks123' database=auditdb
+        connectString: host=oes-db  user='postgres' password='networks123' database=auditdb
       platform:
         type: postgresql
-        connectString: host=oea-db user='postgres' password='networks123' database=platformdb
+        connectString: host=oes-db user='postgres' password='networks123' database=platformdb
     
 kind: Secret
 metadata:
   labels:
-    app: oea
+    app: oes
     component: carina
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-carina-config
+  name: oes-carina-config
 ---
-# Source: isdargo/templates/oea-audit/oea-audit-client-secret.yaml
+# Source: isdargo/templates/oes-audit/oes-audit-client-secret.yaml
 apiVersion: v1
 stringData:
   audit-local.yml: |
     spring:
       datasource:
-        url: jdbc:postgresql://oea-db:5432/auditdb
+        url: jdbc:postgresql://oes-db:5432/auditdb
         username: 'postgres'
         password: 'networks123'
     logging:
@@ -119,17 +119,17 @@ stringData:
         com.opsmx.auditclientservice: INFO
     standardErrorCodes:
       filePath: /opsmx/conf/standard-error-code.csv
-    oea:
+    oes:
       admin:
         user: admin
     feign:
       client:
         platformservice:
           name: platformservice
-          url: http://oea-platform:8095
+          url: http://oes-platform:8095
         visibilityservice:
           name: visibilityservice
-          url: http://oea-visibility:8096
+          url: http://oes-visibility:8096
     
     fixedDelay:
       in:
@@ -143,20 +143,20 @@ stringData:
 kind: Secret
 metadata:
   labels:
-    app: oea
+    app: oes
     component: auditclient
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-audit-client-config
+  name: oes-audit-client-config
 ---
-# Source: isdargo/templates/oea-audit/oea-audit-service-secret.yaml
+# Source: isdargo/templates/oes-audit/oes-audit-service-secret.yaml
 apiVersion: v1
 stringData:
   audit-local.yml: |
     spring:
       datasource:
-        url: jdbc:postgresql://oea-db:5432/auditdb
+        url: jdbc:postgresql://oes-db:5432/auditdb
         username: 'postgres'
         password: 'networks123'
     logging:
@@ -176,30 +176,30 @@ stringData:
       client:
         platformservice:
           name: platformservice
-          url: http://oea-platform:8095
+          url: http://oes-platform:8095
         auditclientservice:
           name: auditclientservice
-          url: http://oea-audit-client:8098
-        oea:
-          url: http://oea-sapor:8085
+          url: http://oes-audit-client:8098
+        oes:
+          url: http://oes-sapor:8085
         autopilot:
-          url: http://oea-autopilot:8090
+          url: http://oes-autopilot:8090
         visibilityservice:
-          url: http://oea-visibility:8096
+          url: http://oes-visibility:8096
         dashboard:
-          url: http://oea-dashboard:8094
+          url: http://oes-dashboard:8094
     
 kind: Secret
 metadata:
   labels:
-    app: oea
+    app: oes
     component: auditservice
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-audit-service-config
+  name: oes-audit-service-config
 ---
-# Source: isdargo/templates/oea-autopilot/oea-autopilot-secret.yaml
+# Source: isdargo/templates/oes-autopilot/oes-autopilot-secret.yaml
 apiVersion: v1
 stringData:
   autopilot.properties: |
@@ -208,20 +208,28 @@ stringData:
     # DB configuration
     secret.datasource.username=postgres
     secret.datasource.password=networks123
-    secret.datasource.url=jdbc:postgresql://oea-db:5432/opsmx
-    secret.platform.url=http://oea-platform:8095
+    secret.datasource.url=jdbc:postgresql://oes-db:5432/opsmx
+    secret.platform.url=http://oes-platform:8095
     secret.ds.protocol=http://
     secret.ds.url=localhost:5005
-    secret.dashboard.url=http://oea-dashboard:8094
+    secret.dashboard.url=http://oes-dashboard:8094
     
     server.host.dns.name=http://sai.isd.ninja-test.opsmx.net/ui
     
     gate.url=http://sai.isd.ninja-test.opsmx.net/gate
     
     #datascience configuration
-    oea.datascience.baseUrl=http://oea-datascience:5005
+    oes.datascience.baseUrl=http://oes-datascience:5005
     #build.analysis=false
     ds.async.flow=true
+    
+    
+    #audit services
+    auditservice.enabled=true
+    auditservice.name=auditservice
+    auditservice.url=http://oes-audit-service:8097
+    auditclientservice.name=auditclientservice
+    auditclientservice.url=http://oes-audit-client:8098
     
     # Standard-error-path
     standardErrorCodes.filePath=/opsmx/conf/standard-error-code.csv
@@ -242,15 +250,15 @@ stringData:
     
 kind: Secret
 metadata:
-  name: oea-autopilot-config
+  name: oes-autopilot-config
   labels:
-    app: oea
+    app: oes
     component: autopilot
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oea-datascience/oea-datascience-secret.yaml
+# Source: isdargo/templates/oes-datascience/oes-datascience-secret.yaml
 apiVersion: v1
 stringData:
   app-config.yml: |
@@ -272,7 +280,7 @@ stringData:
     POSTGRES:
           USERNAME: 'postgres'
           PASSWORD: 'networks123'
-          HOST: oea-db
+          HOST: oes-db
           PORT: 5432
           DB: autopilotqueue
     
@@ -291,11 +299,11 @@ stringData:
 kind: Secret
 metadata:
   labels:
-    app: oea
+    app: oes
     component: datascience
-  name: oea-datascience-config
+  name: oes-datascience-config
 ---
-# Source: isdargo/templates/oea-gate/oea-gate-configmap.yaml
+# Source: isdargo/templates/oes-gate/oes-gate-configmap.yaml
 apiVersion: v1
 stringData:
   gate.yml: |
@@ -307,26 +315,26 @@ stringData:
       retryOnConnectionFailure: true
     services:
       opsmx:
-        baseUrl: http://oea-sapor:8085
+        baseUrl: http://oes-sapor:8085
         enabled: true
       autopilot:
-        baseUrl: http://oea-autopilot:8090
+        baseUrl: http://oes-autopilot:8090
         enabled: true
       platform:
-        baseUrl: http://oea-platform:8095
+        baseUrl: http://oes-platform:8095
         userGroupApiPath: /platformservice/v1/users/{username}/usergroups/importAndCache
         enabled: true
       dashboard:
-        baseUrl: http://oea-dashboard:8094
+        baseUrl: http://oes-dashboard:8094
         enabled: true
       visibility:
-        baseUrl: http://oea-visibility:8096
+        baseUrl: http://oes-visibility:8096
         enabled: true
       auditservice:
-         baseUrl: "http://oea-audit-service:8097"
+         baseUrl: "http://oes-audit-service:8097"
          enabled: true
       auditclient:
-         baseUrl: "http://oea-audit-client:8098"
+         baseUrl: "http://oes-audit-client:8098"
          enabled: true
       oesui:
         externalUrl: /ui/
@@ -385,15 +393,15 @@ stringData:
     
 kind: Secret
 metadata:
-  name: oea-gate-config
+  name: oes-gate-config
   labels:
-    app: oea
+    app: oes
     component: gate
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oea-gate/oea-gate-secret.yaml
+# Source: isdargo/templates/oes-gate/oes-gate-secret.yaml
 apiVersion: v1
 stringData:
   GATEURL: testing
@@ -401,22 +409,22 @@ stringData:
   GATEPASS: saporadmin
 kind: Secret
 metadata:
-  name: oea-gate-secret
+  name: oes-gate-secret
 ---
-# Source: isdargo/templates/oea-platform/oea-platform-secret.yaml
+# Source: isdargo/templates/oes-platform/oes-platform-secret.yaml
 apiVersion: v1
 stringData:
   platform-local.yml: |
     
     spring:
       datasource:
-        url: jdbc:postgresql://oea-db:5432/platformdb
+        url: jdbc:postgresql://oes-db:5432/platformdb
         username: 'postgres'
         password: 'networks123'
     ldap.managerPassword: 'opsmxadmin123'
     redis:
         connection: redis://:password@autopilot-redis-master:6379
-    #datasource.url: jdbc:postgresql://oea-db:5432/visibilitydb
+    #datasource.url: jdbc:postgresql://oes-db:5432/visibilitydb
     #postgres.password: 'networks123'
     #postgres.username: 'postgres'
     
@@ -451,23 +459,23 @@ stringData:
     
     oes:
       sapor:
-        url: http://oea-sapor:8085
+        url: http://oes-sapor:8085
       autopilot:
-        url: http://oea-autopilot:8090
+        url: http://oes-autopilot:8090
       dashboard:
-        url: http://oea-dashboard:8094
+        url: http://oes-dashboard:8094
       visibility:
-        url: http://oea-visibility:8096
+        url: http://oes-visibility:8096
       auditclient:
-        url: http://oea-audit-client:8098
+        url: http://oes-audit-client:8098
       policyGate:
         url: "http://sai.isd.ninja-test.opsmx.net/gate"
         path: /v1/data/
       ui:
-      # Ex: "https://oea-poc.dev.opsmx.org/"
+      # Ex: "https://oes-poc.dev.opsmx.org/"
         url: "http://sai.isd.ninja-test.opsmx.net/ui"
       gate:
-        url: http://oea-gate:8084
+        url: http://oes-gate:8084
       approvalGate:
         apiUrl: http://sai.isd.ninja-test.opsmx.net/gate/visibilityservice/v5/approvalGates/{id}/trigger
     
@@ -482,24 +490,26 @@ stringData:
     
     standardErrorCodes:
       filePath: /opsmx/conf/standard-error-code.csv
+    argoRollout:
+      appAutoCreation: false
     
 kind: Secret
 metadata:
-  name: oea-platform-config
+  name: oes-platform-config
   labels:
-    app: oea
+    app: oes
     component: platform
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oea-sapor/oea-sapor-secret.yaml
+# Source: isdargo/templates/oes-sapor/oea-sapor-secret.yaml
 apiVersion: v1
 stringData:
   application.yml: |
     spring:
       datasource:
-        url: jdbc:postgresql://oea-db:5432/oesdb
+        url: jdbc:postgresql://oes-db:5432/oesdb
         username: 'postgres'
         password: 'networks123'
     
@@ -525,14 +535,14 @@ stringData:
       admin:
         user: admin
       platform:
-        url: http://oea-platform:8095
+        url: http://oes-platform:8095
       visibility:
-        url: http://oea-visibility:8096
+        url: http://oes-visibility:8096
       auditservice:
         enabled: true
-        url: "http://oea-audit-service:8097" 
+        url: "http://oes-audit-service:8097" 
       dashboard:
-        url: http://oea-dashboard:8094
+        url: http://oes-dashboard:8094
       commongateurl: http://sai.isd.ninja-test.opsmx.net/gate
     spinnaker:
       encrypt:
@@ -582,7 +592,7 @@ stringData:
         caCertfile: /opt/opsmx/controller/ca.crt
         certFile: /opt/opsmx/controller/cert/tls.crt
         keyFile: /opt/opsmx/controller/cert/tls.key
-        image: quay.io/opsmxpublic/forwarder-agent:v3.5.6
+        image: quay.io/opsmxpublic/forwarder-agent:v3.5.7
       template:
         path: /opt/opsmx/controller
         kubectlTemplateFileName: kubeconfig.template
@@ -593,21 +603,21 @@ stringData:
     
 kind: Secret
 metadata:
-  name: oea-sapor-config
+  name: oes-sapor-config
   labels:
-    app: oea
+    app: oes
     component: sapor
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oea-visibility/oea-visibility-secret.yaml
+# Source: isdargo/templates/oes-visibility/oea-visibility-secret.yaml
 apiVersion: v1
 stringData:
   visibility-local.yml: |
     spring:
       datasource:
-        url: jdbc:postgresql://oea-db:5432/visibilitydb
+        url: jdbc:postgresql://oes-db:5432/visibilitydb
         username: 'postgres'
         password: 'networks123'
         #sslmode: require
@@ -621,6 +631,14 @@ stringData:
               models: 
                 parameters:
                   AbstractSerializableParameter: ERROR
+    
+    auditservice:
+      enabled: true
+      name: auditservice
+      url: "http://oes-audit-service:8097"
+    auditclientservice:
+      name: auditclientservice
+      url: "http://oes-audit-client:8098"
     
     management:
       endpoints:
@@ -643,7 +661,7 @@ stringData:
         url: http://sai.isd.ninja-test.opsmx.net/ui/application/visibility/{applicationId}/{serviceId}/{approvalGateId}  
     
     gate:
-      url: http://oea-gate:8084
+      url: http://oes-gate:8084
     
     jira:
       api:
@@ -674,11 +692,11 @@ stringData:
     
     autopilot:
       api:
-        url: http://oea-autopilot:8090
+        url: http://oes-autopilot:8090
     
     platform:
       service:
-        url: http://oea-platform:8095
+        url: http://oes-platform:8095
     
     datasource:
       secretManagement:
@@ -690,9 +708,9 @@ stringData:
     
 kind: Secret
 metadata:
-  name: oea-visibility-config
+  name: oes-visibility-config
   labels:
-    app: oea
+    app: oes
     component: visibility
     heritage: "Helm"
     release: "autopilot"
@@ -1191,10 +1209,10 @@ data:
 kind: ConfigMap
 metadata:
   labels:
-    app: oea
+    app: oes
   name: standard-error-codes-config
 ---
-# Source: isdargo/templates/forwarder/oea-forwarder-config.yaml
+# Source: isdargo/templates/forwarder/oes-forwarder-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -1235,7 +1253,7 @@ data:
           destination: opsmx-agent
           destinationService: agent-clouddriver
 ---
-# Source: isdargo/templates/oea-dashboard/oea-dashboard-configmap.yaml
+# Source: isdargo/templates/oes-dashboard/oea-dashboard-configmap.yaml
 apiVersion: v1
 data:
   dashboard-local.yml: |
@@ -1245,14 +1263,14 @@ data:
           mode: OEA-AP
     standardErrorCodes:
       filePath: /opsmx/conf/standard-error-code.csv
-    platformservice.url: http://oea-platform:8095
-    autopilot.url: http://oea-autopilot:8090
-    oes.sapor.url: http://oea-sapor:8085
-    visibilityservice.url: http://oea-visibility:8096
+    platformservice.url: http://oes-platform:8095
+    autopilot.url: http://oes-autopilot:8090
+    oes.sapor.url: http://oes-sapor:8085
+    visibilityservice.url: http://oes-visibility:8096
     auditclientservice:
-      url: "http://oea-audit-client:8098"
+      url: "http://oes-audit-client:8098"
     gateservice:
-      url: "http://oea-gate:8084"
+      url: "http://oes-gate:8084"
     app:
       sync:
         enabled: true
@@ -1260,15 +1278,15 @@ data:
     
 kind: ConfigMap
 metadata:
-  name: oea-dashboard-config
+  name: oes-dashboard-config
   labels:
-    app: oea
+    app: oes
     component: dashboard
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oea-ui/oea-ui-configmap.yaml
+# Source: isdargo/templates/oes-ui/oea-ui-configmap.yaml
 apiVersion: v1
 data:
   app-config.json: |
@@ -1299,7 +1317,7 @@ data:
     where OpsMx hosts the ISD Platform, but services used by the platform are within
     a secure area owned by the customer. One of the core advantages of using an agent
     is that the credentials do not need to be disclosed to anyone i.e. credentials remain
-    with-in the cluster where deployment is done.</p> <p>The Agent is a two part system:
+    with-in the cluster where deployment is  done.</p> <p>The Agent is a two part system:
     a <b>Controller</b> runs near ISD, and the <b>Agent</b> runs in the target secure
     cluster. The Agent is configured to communicate with specific services (Kubernetes,
     Jenkins etc) within a customer's security domain, while the Controller is in ISD's
@@ -1308,13 +1326,12 @@ data:
     etc. Services are configured in the Agent by the customer. URL endpoints, CD account
     names and credentials are provided to the agent using a service configuration. The
     credentials never leave the agent's security domain.</p> <p>Click on <b>New Agent</b>
-    to create the Agent for your environment. This button is enabled when CD Instance
-    is configured in <b>Setup->CD Integration</b>.\"\n  },\n  \"AGENT_CREATION\": {\n
-    \   \"HEADER\": \"Agent\",\n    \"BODY\": \"<div><p>Adding an agent involves the
-    following steps:</p><ul class='helpTextUI'><li>Enter the details (name, cluster
-    and description) and click save</li> <li>Click <b>Download Manifest</b> which appears
-    after save</li><li>In the remote Kubernetes cluster, create service configmap in
-    the default namespace. Examples are available here: https://github.com/OpsMx/standard-gitops-repo/tree/master/SAMPLES/agent-config</li>
+    to create the Agent for your environment.\"\n  },\n  \"AGENT_CREATION\": {\n    \"HEADER\":
+    \"Agent\",\n    \"BODY\": \"<div><p>Adding an agent involves the following steps:</p><ul
+    class='helpTextUI'><li>Enter the details (name, cluster and description) and click
+    save</li> <li>Click <b>Download Manifest</b> which appears after save</li><li>In
+    the remote Kubernetes cluster, create service configmap in the default namespace.
+    Examples are available here: https://github.com/OpsMx/standard-gitops-repo/tree/master/SAMPLES/agent-config</li>
     <li>Apply the downloaded manifest in the default namespace using <b>kubectl apply
     -f <downloaded file></b> ; Note that the agent should be able to reach the Load
     Balancer configured for the agent-grpc service,</li><li>Check the Setup->Agents
@@ -1441,7 +1458,7 @@ data:
     update information about your CD instance.</p> <p><strong>Fields:</strong></p> <ul
     class='helpTextUI'> <li><strong>CD Name</strong>: User defined name for CD instance.<br><span>
     Example: opsmx-spinnaker</span></li> <li><strong>CD URL</strong>: Gate URL of the
-    CD instance.<br> <span>Example: https://spinnaker-gate.xyz.com or http://oea-gate:8084</span></li>
+    CD instance.<br> <span>Example: https://spinnaker-gate.xyz.com or http://oes-gate:8084</span></li>
     <li><strong>Authentication Type:</strong>: Can be LDAP or X509; for AD, use LDAP</li>
     <li><strong>Token: </strong> This is used when Authentication Type is LDAP; username
     & password to LDAP server separated by <b>:</b> in base64 format; Output of 'echo
@@ -1454,8 +1471,13 @@ data:
     Control for Accounts: </strong>You can specify the repository for External configuration
     in Spinnaker</li> <li><strong>Source Control for Pipeline: </strong>You can specify
     the repository for pipeline gitOps that allows you to save and restore pipelines
-    from a git repository</li></ul>\",\n    \"SPINNAKER_NAME\": {\n      \"TOOLTIP\":
-    \"Name of the Spinnaker instance\",\n      \"VALIDATION_MESSAGE\": {\n        \"required\":
+    from a git repository</li></ul>\",\n    \"ACCOUNT_CREATION_INFO\": \"The CD name
+    should be the same as the Spinnaker name configured in echo-local.yml\",\n    \"ACCOUNT_CREATION_ADDITIONAL_INFO\":
+    \"<p></p><p>Adding a Spinnaker instance with CD Name different than the Spinnaker
+    name configured in <i>echo-local.yml</i> will require a manual update to the <i>echo-local.yml</i>
+    and a <i>hal deploy apply</i>. This change is required to allow publishing Spinnaker
+    events to RabbitMQ.</p>\",\n    \"SPINNAKER_NAME\": {\n      \"TOOLTIP\": \"Name
+    of the Spinnaker instance\",\n      \"VALIDATION_MESSAGE\": {\n        \"required\":
     \"CD Name cannot be empty\",\n        \"cannotContainSpace\": \"CD Name cannot contain
     space\",\n        \"noSpecialCharacters\": \"Allowed special character is '-'\",\n
     \       \"startingFromNumber\": \"CD Name should not start with number\"\n      }\n
@@ -1517,13 +1539,9 @@ data:
     cannot contain space\",\n        \"startingFromNumber\": \"Bucket Name should not
     start with number\"\n      }\n    }\n  },\n  \"INTEGRATOR_LISTING\": {\n    \"HEADER\":
     \"No Integrator found!\",\n    \"BODY\": \"<div><p>ISD offers integration with many
-    CI/CD Tools. Integrations are grouped under the following categories - Artifact,
-    CI, Governance, Monitoring Tools, Notifications, Policy and SAST/DAST.</p> <p>Integrations
-    are used to</p> <ul><li>pull logs & metrics for Continuous Verification</li><li>pull
-    meta data from CI/CD Tools for Informed Approvals</li><li>enforce organizational
-    policies at the time of creation or execution of a pipeline</li><li>configure Artifacts,
-    Cloud Providers etc.</li><p>Click on the <b<New Integration</b> button to start
-    integrating your tools </p></div>\",\n    \"SYNC_SPINNAKER_ACCOUNTS\": {\n      \"TOOLTIP\":
+    monitoring providers. These integrations are used to pull logs & metrics for Continuous
+    Verification.</p><p>Click on the <b>New Integration</b> button to start integrating
+    your tools. </p></div>\",\n    \"SYNC_SPINNAKER_ACCOUNTS\": {\n      \"TOOLTIP\":
     \"Push Integration changes to Spinnaker\",\n      \"VALIDATION_MESSAGE\": \"\"\n
     \   }\n  },\n  \"PIPELINE_EXECUTION_AUDIT_LISTING\": {\n    \"HEADER\": \"Pipeline
     executions not found!\",\n    \"BODY\": \"<div>This page shows pipeline executions
@@ -1580,27 +1598,22 @@ data:
     policy\"\n    },\n    \"POLICY_FILE\": {\n      \"TOOLTIP\": \"File containing the
     Policy. You can upload the file by clicking on 'Choose File' button. This is optional.
     If not present, you can enter the policy directly in the 'Policy Details' field\"\n
-    \   }\n  },\n  \"VERIFICATION\": {\n    \"HEADER\": \"Verification Gate executions
-    not found!\",\n    \"BODY\": \"<div><p>This page shows Verification Gate executions
-    in a list view.</p> <p>The Continuous Verification performs automated log and metrics
-    analysis for new releases with built-in unsupervised and supervised machine learning
-    algorithms for risk analysis and canary deployments.</p><p>Continuous Verification
-    is a release verification process that provides Dev and Ops engineers an intelligent
-    automated real-time actionable risk assessment of a new release deployed. The Continuous
-    Verification verifies the latest version of the service comparing to the baseline
-    or prior release after production rollout. The baseline can be a deployment done
-    prior or the current deployment during rollout using canary or blue/green or rolling
-    update strategies.</p> <p>It leverages unsupervised and supervised machine learning
-    techniques to analyze 100s of metrics and logs data to perform in-depth analysis
-    of architectural regressions, performance, scalability and security violations of
-    new releases in a scalable way for enterprises.</p> <p>ISD provides a Verification
-    Gate to analyze logs from your Target Application and this can be inserted as a
-    Stage in your CI/CD Pipeline. Note that one must configure the metric and log datasources,
-    such as Prometheus and Elastic before using this functionality.</p> <p>Insert Verification
-    Gate to a pipeline in your application using <b>Pipeline Builder -> Add Stage</b>.
-    When the pipeline is run, the Gate executions will start appearing in this page.</p></div>\",\n
-    \   \"LOG_ANALYSIS\": {\n      \"BODY\": \"\",\n      \"SENSITIVITY\": {\n        \"TOOLTIP\":
-    \"Impact of Unexpected Issues on the log scoring\",\n        \"VALIDATION_MESSAGE\":
+    \   }\n  },\n  \"VERIFICATION\": {\n    \"HEADER\": \"No Analysis Report found!\",\n
+    \   \"BODY\": \"<div><p>This page shows Analysis reports in a list view. To configure
+    an analysis for your application, visit the manage analysis page.</p><p>The Continuous
+    Verification performs automated log and metrics analysis for new releases with built-in
+    unsupervised and supervised machine learning algorithms for risk analysis and canary
+    deployments.</p><p>Continuous Verification is a release verification process that
+    provides Dev and Ops engineers an intelligent automated real-time actionable risk
+    assessment of a new release deployed. The Continuous Verification verifies the latest
+    version of the service compared to the baseline or prior release before, during
+    or after a production rollout. The baseline can be a deployment done prior or the
+    current deployment during rollout using canary or blue/green strategies.</p><p>It
+    leverages unsupervised and supervised machine learning techniques to analyse 100s
+    of metrics and logs data to perform in-depth analysis of architectural regressions,
+    performance, scalability and security violations of new releases in a scalable way
+    for enterprises.</p></div>\",\n\t\"LOG_ANALYSIS\": {\n      \"BODY\": \"\",\n      \"SENSITIVITY\":
+    {\n        \"TOOLTIP\": \"Impact of Unexpected Issues on the log scoring\",\n        \"VALIDATION_MESSAGE\":
     {}\n      },\n      \"PERCEIVED_RISK\": {\n        \"TOOLTIP\": \"The overall risk
     associated with changes made in this verification run\",\n        \"VALIDATION_MESSAGE\":
     {}\n      }\n    },\n    \"ANALYSIS_SUMMARY\": {\n      \"LOG_TEMPLATE\": {\n        \"TOOLTIP\":
@@ -1633,6 +1646,8 @@ data:
     to perform the current verification run\",\n        \"VALIDATION_MESSAGE\": {}\n
     \     },\n      \"LIFETIME_HOURS\": {\n        \"TOOLTIP\": \"The duration for which
     the canary analysis was performed, 1 lifetime hour is equal to 1 hour.\",\n        \"VALIDATION_MESSAGE\":
+    {}\n      },\n      \"LIFETIME_MINUTES\": {\n        \"TOOLTIP\": \"How many minutes
+    to let this analysis run before making a final determination\",\n        \"VALIDATION_MESSAGE\":
     {}\n      },\n      \"RECLASSIFICATION_DURATION\": {\n        \"TOOLTIP\": \"The
     time taken to perform reclassification\",\n        \"VALIDATION_MESSAGE\": {}\n
     \     },\n      \"INTERVAL_MINUTES\": {\n        \"TOOLTIP\": \"The Lifetime hours
@@ -1780,11 +1795,11 @@ data:
     {\n        \"groupValid\": \"Groups cannot be empty\",\n        \"permissionsValid\":
     \"Atleast 1 permission should be assigned to the groups\",\n        \"allPermissionForOneGroup\":
     \"Atleast 1 group should have all permissions\"\n      }\n    },\n    \"INTEGRATORS_PERMISSIONS\":
-    {\n      \"TOOLTIP\": \"Authorization definition for this Integration\",\n      \"VALIDATION_MESSAGE\":
-    \"\"\n    },\n    \"CLOUD_PROVIDER_PERMISSIONS\": {\n      \"TOOLTIP\": \"Authorization
-    definition for this Cloud Targets\",\n      \"VALIDATION_MESSAGE\": \"\"\n    },\n
-    \   \"AGENT_PERMISSIONS\": {\n      \"TOOLTIP\": \"Authorization definition for
-    this Agent\",\n      \"VALIDATION_MESSAGE\": \"\"\n    },\n    \"POLICY_PERMISSIONS\":
+    {\n      \"TOOLTIP\": \"Configure specific user group’s access to this integration.\",\n
+    \     \"VALIDATION_MESSAGE\": \"\"\n    },\n    \"CLOUD_PROVIDER_PERMISSIONS\":
+    {\n      \"TOOLTIP\": \"Authorization definition for this Cloud Targets\",\n      \"VALIDATION_MESSAGE\":
+    \"\"\n    },\n    \"AGENT_PERMISSIONS\": {\n      \"TOOLTIP\": \"Authorization definition
+    for this Agent\",\n      \"VALIDATION_MESSAGE\": \"\"\n    },\n    \"POLICY_PERMISSIONS\":
     {\n      \"TOOLTIP\": \"Authorization definition for this Policy\",\n      \"VALIDATION_MESSAGE\":
     \"\"\n    },\n    \"ADD_GROUP\": {\n      \"TOOLTIP\": \"Add New Group\",\n      \"VALIDATION_MESSAGE\":
     \"\"\n    },\n    \"DELETE\": {\n      \"TOOLTIP\": \"Delete\",\n      \"VALIDATION_MESSAGE\":
@@ -1868,146 +1883,200 @@ data:
     {\n    \"HEADER\": \"No Users found\",\n    \"BODY\": \"\"\n  },\n    \n  \"APPLICATION_DEPLOYMENT\":
     {\n    \"DEPLOYMENT_GRID_SYNC\": {\n      \"TOOLTIP\": \"When the cluster deployment
     matches with the latest pipeline execution it is 'In Sync'; if not, it is 'Out of
-    Sync'\"\n    }\n  },\n          \"INTEGRATION\": {\n\"AMAZONS3\":{\n  \"HEADER\":
-    \"Amazon S3\",\n  \"BODY\":\"<span><p>Amazon S3 integration can be used to configure
-    Spinnaker for Amazon S3.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
-    Name</strong>: User defined name for the Amazon S3 Account <span class='noBr'>(Example:
-    opsmx-s3)</span></li><li><strong>Access Key Id</strong>: AWS Access Key Id</li><li><strong>Secret
-    Access Key</strong>: AWS Secret Access Key</li><li><strong>Connect to Spinnaker</strong>:
-    Toggle to configure Spinnaker for Amazon S3</li><li><strong>Permissions</strong>:
-    Enable/disable access to the Amazon S3 account in Autopilot to specific usergroups</li></ul></span>\",\n
-    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of the account to operate on\",\n
+    Sync'\"\n    }\n  },\n\"INTEGRATION\": {\n\"AMAZONS3\":{\n  \"HEADER\": \"Amazon
+    S3\",\n  \"BODY\":\"<span><p>Spinnaker can be configured to use AWS S3 bucket as
+    Spinnaker's persistent storage or Artifact source</p><p><strong>Fields</strong>:</p><ul
+    class='helpTextUl'><li><strong>Account Name</strong>: User-defined account name
+    for your AWS S3 access. The account name appears in Spinnaker as an input source
+    for artifact selection.<span class='noBr'></span></li><li><strong>Access Key Id</strong>:
+    AWS IAM user access key who has access to the identified S3 bucket. Not required,
+    If Spinnaker is running in EC2 or EKS with an associated IAM role. In that case,
+    the IAM instance role is used for S3 connectivity.</li><li><strong>Secret Access
+    Key</strong>: AWS IAM user Secret Key. Not required, If Spinnaker is running in
+    EC2 or EKS with an associated IAM role. In that case, the IAM instance role is used
+    for S3 connectivity.</li><li><strong>Region</strong>: AWS region where the AWS S3
+    bucket is located</li><li><strong>API Region</strong>: AWS S3 API region, only required
+    when using an S3 clone such as Minio</li><li><strong>API Endpoint</strong>: AWS
+    S3 API endpoint, only required when using an S3 clone such as Minio</li><li><strong>Connect
+    to CD</strong>: Toggle on to propagate the change into the CD Tool.</li><li><strong>Permissions</strong>:
+    Enable/disable access to the Amazon S3 account in Autopilot to specific user groups</li></ul></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your AWS S3
+    access. The account name appears in Spinnaker as an input source for artifact selection.\",\n
     \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
     contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"ACCESS_ID\":{\n    \"TOOLTIP\":\"AWS Access Key Id\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Access Key Id cannot be empty\"\n    }\n  },\n  \"SECRET_KEY\":{\n
-    \   \"TOOLTIP\":\"AWS Secret Access Key\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Secret
-    Access Key cannot be empty\"\n    }\n  },\n  \"REGION\":{\n    \"TOOLTIP\":\"S3
-    region\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"S3 region cannot be
-    empty\"\n    }\n  },\n  \"APIENDPOINT\":{\n    \"TOOLTIP\":\"S3 api endpoint\",\n
-    \   \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"APIREGION\":{\n    \"TOOLTIP\":\"S3
-    api region\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
-    \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
-    Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"ARTIFACTORY\":{\n
-    \ \"HEADER\": \"Artifactory\",\n  \"BODY\":\"<span><p>Artifactory integration can
-    be used as a datasource for Approval Gate as well as to configure Spinnaker for
-    Artifactory.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
-    Name</strong>: User defined name for the Artifactory Account <span class='noBr'>(Example:
-    opsmx-artifactory)</span></li><li><strong>Endpoint</strong>: Artifactory URL <span
-    class='noBr'>(Example: https://xyz.myjfrog.com)</span></li><li><strong>Token</strong>:
+    \ },\n  \"ACCESS_ID\":{\n    \"TOOLTIP\":\"AWS IAM user's access key who has access
+    to the identified S3 bucket. Not required, If Spinnaker is running in EC2 or EKS
+    with an associated IAM role. In that case, the IAM instance role is used for S3
+    connectivity.\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Access Key
+    Id cannot be empty\"\n    }\n  },\n    \"SECRET_KEY\":{\n      \"TOOLTIP\":\"AWS
+    IAM user Secret Key. Not required, If Spinnaker is running in EC2 or EKS with an
+    associated IAM role. In that case, the IAM instance role is used for S3 connectivity.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Secret Access Key cannot be empty\"\n
+    \   }\n  },\n  \"REGION\":{\n    \"TOOLTIP\":\"AWS region where the AWS S3 bucket
+    is located\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"S3 region cannot
+    be empty\"\n    }\n  },\n  \"APIENDPOINT\":{\n    \"TOOLTIP\":\"AWS S3 API endpoint,
+    only required when using an S3 clone such as Minio\",\n    \"VALIDATION_MESSAGE\":{\n
+    \   }\n  },\n  \"APIREGION\":{\n    \"TOOLTIP\":\"AWS S3 API region, only required
+    when using an S3 clone such as Minio\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n
+    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to configure the
+    resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"ARTIFACTORY\":{\n  \"HEADER\": \"Artifactory\",\n  \"BODY\":\"<span><p>JFrog
+    Artifactory integration can be used as an Artifact source in Spinnaker and also
+    a Data source for Approval-Gate.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
+    Name</strong>: User-defined account name for your Jfrog Artifactory access. The
+    account name appears in Spinnaker as an Artifactory trigger type input.</li><li><strong>Endpoint</strong>:
+    The base URL of your Artifactory search is reachable at. <span class='noBr'>(Example:
+    https://xyz.my-jfrog.com)</span></li><li><strong>Repo</strong>: The Artifactory
+    repo which needs to be searched</li><li><strong>Repo Type</strong>: The package
+    type of repo in your Artifactory is to be searched. Default is Maven.</li><li><strong>Group
+    Id</strong>: The group id in your Artifactory is to be searched</li><li><strong>Username</strong>:
+    The Artifactory user's username for authentication</li><li><strong>Password</strong>:
+    The Artifactory user's password for authentication</li><li><strong>Token</strong>:
     Artifactory personal access token. You can find <a href='https://www.jfrog.com/confluence/display/JFROG/Access+Tokens'
     target='_blank'>here</a> how to generate personal access tokens. <span class='autolinebreak'>(Example:
     ZlQDAwMFwvdXNlcnNcL21hZGh1a2FyIiwic2NwIjoiYXBwbGllZC1wZXJtaXNzaW9uc1wvYWRtaW4gYXBpOioiLCJhdWQiOlsiamZydEAqIiwiamZhY0AqIiwiamZldnmbWRAKiJdLCJpc3MiOiJqZmZlQDAAzNzY3MiwiaWF0IjoxNjI5ODY0ODcyLCJqdGkiOiI1ZWFiNjlhYi1hZDY0LTRjOGItOTMyZC0wMDAxMWZiZWU5YWIifQ.tzBgL3fQgZ1dwlLLS2UAT7G)</span></li><li><strong>Connect
-    to Spinnaker</strong>: Toggle to configure Spinnaker for Artifactory</li><li><strong>Permissions</strong>:
-    Enable/disable access to the Artifactory account in Autopilot to specific usergroups</li></ul></span>\",\n
-    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of the account to operate on\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
-    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    to Spinnaker</strong>: Toggle on to propagate the change into the CD Tool.</li><li><strong>Permissions</strong>:
+    Enable or disable specific user groups' access to the Artifactory account in ISD.</li></ul></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your Jfrog
+    Artifactory access. The account name appears in Spinnaker as an Artifactory trigger
+    type input.\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"ENDPOINT\":{ \n    \"TOOLTIP\":\"The base url your artifactory search
+    \ },\n  \"ENDPOINT\":{ \n    \"TOOLTIP\":\"The base URL of your Artifactory search
     is reachable at\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Endpoint
     cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"REPO\":{
     \n    \"TOOLTIP\":\"The repo in your artifactory to be searched\",\n    \"VALIDATION_MESSAGE\":{\n
     \     \"required\":\"Repo cannot be empty\"\n    }\n  },\n  \"REPOTYPE\":{ \n    \"TOOLTIP\":\"The
-    package type of repo in your artifactory to be searched\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"GROUPID\":{ \n    \"TOOLTIP\":\"The group id in your artifactory
-    to be searched\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Authentication cannot be empty\"\n
-    \   }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The Token of the artifactory user
-    to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
-    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The username
-    of the artifactory user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Username
-    cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"The password
-    of the artifactory user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
-    cannot be empty\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch
-    On this toggle to configure the resource in a gitops enabled Spinnaker instance\",\n
-    \   \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"BITBUCKET\":{\n  \"HEADER\": \"Bitbucket
-    Cloud\",\n  \"BODY\":\"<span><p>BitBucket Cloud integration can be used as a datasource
-    for Approval Gate as well as to configure Spinnaker for BitBucket Cloud.</p><p><strong>Fields</strong>:</p><ul
-    class='helpTextUl'><li><strong>Name</strong>: User defined name for the Bitbucket
-    Cloud Account <span class='noBr'>(Example: opsmx-bitbucket)</span></li><li><strong>Host
-    URL</strong>: BitBucket Cloud URL <span class='noBr'>(Example: https://bitbucket.org)</span></li><li><strong>API
-    URL</strong>: This is needed by Autopilot to access Bitbucket Cloud resources such
-    as accounts & repositories through API calls <span class='noBr'>(Example: https://api.bitbucket.org/2.0/repositories)</span></li><li><strong>Authentication
-    Type</strong>: can be Token or User Name/Password</li><li><strong>User Name</strong>:
-    Bitbucket Cloud User Name</li><li><strong>Token</strong>: BitBucket personal access
-    token <span class='noBr'>(Example: xCPkVZfxaE9iULmfYYkK)</span></li> <li><strong>Password</strong>:
-    Bitbucket Cloud Password</li><li><strong>Connect to Spinnaker</strong>: Toggle to
-    configure Spinnaker for Bitbucket Cloud</li><li><strong>Permissions</strong>: Enable/disable
-    access to the Bitbucket Account in Autopilot to specific usergroups</li></ul></span>\",\n
-    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of the account to operate on\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
-    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    package type of repo in your Artifactory is to be searched. Default is Maven.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"GROUPID\":{ \n    \"TOOLTIP\":\"The
+    group id in your Artifactory is to be searched.\",\n    \"VALIDATION_MESSAGE\":{\n
+    \   }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external
+    resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Authentication
+    cannot be empty\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The Token of the
+    artifactory user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
+    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The Artifactory
+    user's username for authentication\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Username
+    cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"The Artifactory
+    user's password for authentication\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
+    cannot be empty\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle
+    on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"BITBUCKET\":{\n  \"HEADER\": \"Bitbucket Cloud\",\n  \"BODY\":\"<span><p>BitBucket
+    Cloud integration can be used as a datasource for Approval Gate as well as to configure
+    Spinnaker for BitBucket Cloud.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
+    Name</strong>: User-defined account name for your BitBucket Cloud access. <span
+    class='noBr'>(Example: opsmx-bitbucket)</span></li><li><strong>Host URL</strong>:
+    BitBucket Cloud (SaaS) Web URL. <span class='noBr'>It is usually https://bitbucket.org
+    </span></li><li><strong>API URL</strong>: This is needed by Autopilot to access
+    Bitbucket Cloud resources such as accounts & repositories through API calls <span
+    class='noBr'>(Example: https://api.bitbucket.org/2.0/repositories)</span></li><li><strong>Authentication
+    Type</strong>: Select one of the available options. If you are unsure, consult your
+    BitBucket administrator to determine which authentication mechanism is used.</li><li><strong>Anonymous</strong>:
+    No username or password is used. Access identity is anonymous.</li><li><strong>User
+    Name</strong>: The BitBucket Cloud Service username </li><li><strong>Token</strong>:
+    The user's username and access token This token is obtained from the Bitbucket user
+    profile page here. <span class='noBr'>(Example: xCPkVZfxaE9iULmfYYkK)</span></li>
+    <li><strong>Password</strong>: The BitBucket Cloud Service password</li><li><strong>Connect
+    to Spinnaker</strong>: Toggle on to propagate the change into the CD Tool.</li><li><strong>Permissions</strong>:
+    Enable/disable access to the Bitbucket Account in Autopilot to specific user groups</li></ul></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your BitBucket
+    Cloud access.\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"BitBucket Cloud URL\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Host URL cannot be empty\",\n      \"invalidUrl\": \"URL is
-    invalid\"\n    }\n  },\n  \"APIURL\":{\n    \"TOOLTIP\":\"Bitbucket API base URL.
-    Eg. https://api.github.com\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
+    \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"BitBucket Cloud (SaaS) Web URL. It is usually
+    https://bitbucket.org\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host
     URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
-    \ \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external resource confirms
-    the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The
-    Token of the Bitbucket user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Token cannot be empty\"\n     }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The
-    username of the Bitbucket user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"User Name cannot contain special characters other
-    than - and _\",\n      \"cannotContainSpace\":\"User Name cannot contain space\",\n
-    \     \"required\":\"User Name cannot be empty\",\n      \"startingFromNumber\":
-    \"User Name cannot start with numbers\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"The
-    password of the Bitbucket user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n
+    \ \"APIURL\":{\n    \"TOOLTIP\":\"Bitbucket API base URL. Eg. https://api.github.com\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"API URL cannot be empty\",\n
+    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
+    \   \"TOOLTIP\":\"Select one of the available options. If you are unsure, consult
+    your BitBucket administrator to determine which authentication mechanism is used.\",\n
+    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The user's
+    access token. This token is obtained from the Bitbucket user profile page.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n    }\n
+    \ },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The BitBucket Cloud Service username\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User Name cannot
+    contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
+    \ \"PASSWORD\":{\n    \"TOOLTIP\":\"The BitBucket Cloud Service password\",\n    \"VALIDATION_MESSAGE\":{\n
     \     \"required\":\"Password cannot be empty\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
     \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
     Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"BITBUCKET_SERVER\":{\n
     \ \"HEADER\": \"Bitbucket Server\",\n  \"BODY\":\"<span><p>BitBucket Server integration
     can be used as a datasource for Approval Gate as well as to configure Spinnaker
     for BitBucket Server.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
-    Name</strong>: User defined name for the Bitbucket Server Account <span class='noBr'>(Example:
-    opsmx-bitbucket)</span></li><li><strong>Host URL</strong>: BitBucket Server URL
-    <span class='noBr'>(Example: https://xyz.mybitbucket.com)</span></li><li><strong>Authentication
-    Type</strong>: can be Token or User Name/Password</li><li><strong>User Name</strong>:
-    Bitbucket Server User Name</li><li><strong>Token</strong>: BitBucket Server personal
-    access token. You can find <a href='https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html'
+    Name</strong>: User-defined account name for your BitBucket Cloud access. <span
+    class='noBr'>(Example: opsmx-bitbucket)</span></li><li><strong>Host URL</strong>:
+    BitBucket Cloud (SaaS) Web URL. <span class='noBr'> It is usually https://bitbucket.org</span></li><li><strong>Authentication
+    Type</strong>: Select one of the available options. If you are unsure, consult your
+    BitBucket administrator to determine which authentication mechanism is used.</li><li><strong>Anonymous</strong>:
+    No username or password is used. Access identity is anonymous.</li><li><strong>Token</strong>:
+    The user's username and access token This token is obtained from the Bitbucket user
+    profile page. You can find <a href='https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html'
     target='_blank'>here</a> how to generate personal access tokens. <span class='noBr'>(Example:
-    DjpMgHmwqUnIvvmljFgqGQ)</span></li><li><strong>Password</strong>: Bitbucket Server
-    Password</li><li><strong>Connect to Spinnaker</strong>: Toggle to configure Spinnaker
-    for Bitbucket Server</li><li><strong>Permissions</strong>: Enable/disable access
-    to the Bitbucket Server account in Autopilot to specific usergroups</li></ul></span>\",\n
-    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of the account to operate on\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
-    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    DjpMgHmwqUnIvvmljFgqGQ)</span></li><li><strong>Username & Password </strong>: Accepts
+    the user's username and password to connect to Bitbucket. Deprecated and not recommended.</li><li><strong>User
+    Name</strong>: Bitbucket Server User Name</li><li><strong>Password</strong>: Bitbucket
+    Server Password</li><li><strong>Connect to Spinnaker</strong>: Toggle on to propagate
+    the change into the CD Tool.</li><li><strong>Permissions</strong>: Enable/disable
+    access to the Bitbucket Server account in Autopilot to specific user groups</li></ul></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your BitBucket
+    Cloud access.\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Bitbucket Cloud URL\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Host URL cannot be empty\",\n      \"invalidUrl\": \"URL is
-    invalid\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how
-    the external resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The Token of the Bitbucket user to authenticate
-    as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n
-    \   }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The username of the Bitbucket user
-    to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
-    Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
-    \ \"PASSWORD\":{\n    \"TOOLTIP\":\"The password of the Bitbucket user to authenticate
-    as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password cannot be empty\"\n
-    \   }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to
-    configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"DOCKERHUB\":{\n  \"HEADER\": \"Docker Registry\",\n  \"BODY\":\"\",\n
-    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of the account to operate on\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
-    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external resource
-    confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n
-    \   \"TOOLTIP\":\"The token of the Docker Registry user to authenticate as\",\n
+    \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"BitBucket Cloud (SaaS) Web URL. It is usually
+    https://bitbucket.org\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host
+    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    \ \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select one of the available options.
+    If you are unsure, consult your BitBucket administrator to determine which authentication
+    mechanism is used.\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The
+    user's access token. This token is obtained from the Bitbucket user profile page.\",\n
     \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n    }\n
-    \ },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The username of the Docker Registry user
-    to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \ },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The BitBucket Server username\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"User Name cannot contain special characters other
+    than - and _\",\n      \"cannotContainSpace\":\"User Name cannot contain space\",\n
+    \     \"required\":\"User Name cannot be empty\",\n      \"startingFromNumber\":
+    \"User Name cannot start with numbers\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"The
+    BitBucket server password\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
+    cannot be empty\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch
+    On this toggle to configure the resource in a gitops enabled Spinnaker instance\",\n
+    \   \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"DOCKERHUB\":{\n  \"HEADER\": \"Docker
+    Registry\",\n  \"BODY\":\"<span><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
+    Name</strong>: User-defined account name for your Docker registry access.</li><li><strong>Registry
+    URL</strong>: The registry URL from which you want to pull and deploy images. <span
+    class='noBr'> DockerHub example: https://hub.docker.com</span></li><li><strong>Email</strong>:
+    Users docker registry email. If no value is specified, the default value of fake.email@spinnaker.io
+    will be used.</li><li><strong>Repositories</strong>: An optional list of repositories
+    to cache images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. <span class='noBr'> Example:
+    library/ubuntu (Public repositories are prefixed with library/)</span></li><li><strong>Group
+    Membership</strong>: Select an authentication type that corresponds to the connection
+    credential parameter.</li><li><strong>Connect to Spinnaker</strong>: Toggle on to
+    propagate the change into the CD Tool.</li></ul></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for your Docker registry access.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
+    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The registry URL from which you want
+    to pull and deploy images. DockerHub example: https://hub.docker.com\",\n    \"VALIDATION_MESSAGE\":
+    {\n  \"required\": \"Registry URL cannot be empty\"\n}\n  },\n\"EMAIL\":{\n  \"TOOLTIP\":\"Users
+    docker registry email. If no value is specified, the default value of fake.email@spinnaker.io
+    will be used.\"\n},\n\"REPOSITORIES\":{\n\"TOOLTIP\":\"An optional list of repositories
+    to cache images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. Example: library/ubuntu (Public
+    repositories are prefixed with library/)\"\n},\n\"GROUPMEMBERSHIP\":{\n  \"TOOLTIP\":\"\"\n
+    \ },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication type
+    that corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The token of the Docker Registry user to
+    authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot
+    be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The username of the
+    Docker Registry user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
     \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
@@ -2016,88 +2085,118 @@ data:
     cannot be empty\"\n    }\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Docker Registry
     Host URL\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL cannot
     be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
-    \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
-    Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"OCR\":{\n  \"HEADER\":
-    \"Generic Docker Registries (ACR, Quay, JFrog)\",\n  \"BODY\":\"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"REPOSITORIES\":{\n
-    \   \"TOOLTIP\":\"An optional list of repositories to cache images from\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"cannotContainSpace\":\"Repository cannot contain space\",\n      \"startingFromNumber\":
-    \"Repository cannot start with numbers\"\n    }\n  },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The
-    registry address you want to pull and deploy images from. For example:quay.io -
-    Quay\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Registry URL cannot
-    be empty\"\n    }\n  },\n  \"GROUPMEMBERSHIP\":{\n    \"TOOLTIP\":\"A user must
-    be a member of at least one specified group in order to make changes to this account’s
+    \   \"TOOLTIP\":\"Toggle on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"OCR\":{\n  \"HEADER\": \"Generic Docker Registries (ACR, Quay, JFrog)\",\n
+    \ \"BODY\":\"<span><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
+    Name</strong>: User-defined account name for your GCR Docker registry access.</li><li><strong>Registry
+    URL</strong>: The registry URL from which you want to pull and deploy images. <span
+    class='noBr'> For example: https://quay.io - RedHat quay.io</span></li><li><strong>Email</strong>:
+    Users docker registry email. If no value is specified, the default value of fake.email@spinnaker.io
+    will be used.</li><li><strong>Repositories</strong>: An optional list of repositories
+    to cache images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. <span class='noBr'> Example:
+    library/ubuntu (Public repositories are prefixed with library/)</span></li><li><strong>Authentication
+    Type</strong>: Select an authentication type that corresponds to the connection
+    credential parameter.</li><li><strong>Connect to Spinnaker</strong>: Toggle on to
+    propagate the change into the CD Tool.</li></ul></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for your GCR Docker registry access.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
+    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"REPOSITORIES\":{\n    \"TOOLTIP\":\"An optional list of repositories to
+    cache images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. Example: library/ubuntu (Public
+    repositories are prefixed with library/)\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository
+    cannot contain space\",\n      \"startingFromNumber\": \"Repository cannot start
+    with numbers\"\n    }\n  },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The registry
+    URL from which you want to pull and deploy images. For example: https://quay.io
+    - RedHat quay.io\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Registry
+    URL cannot be empty\"\n    }\n  },\n  \"EMAIL\":{\n    \"TOOLTIP\":\"Users docker
+    registry email. If no value is specified, the default value of fake.email@spinnaker.io
+    will be used.\"\n  },\n  \"GROUPMEMBERSHIP\":{\n    \"TOOLTIP\":\"A user must be
+    a member of at least one specified group in order to make changes to this account’s
     cloud resources\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository
     cannot contain space\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select
-    how the external resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"Your docker registry token\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"Your
-    docker registry password\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
-    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"Your docker
-    registry username\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    an authentication type that corresponds to the connection credential parameter.\",\n
+    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"Container
+    Registry Personal Access Token\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
+    cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"Your docker
+    registry password\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
+    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"Container Registry
+    User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User
+    Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
-    \ \"HOSTURL\":{\n    \"TOOLTIP\":\"Container Registry Host URL\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Host URL cannot be empty\",\n      \"invalidUrl\": \"URL is
-    invalid\"\n    }\n  }\n},\n\"GITHUB\":{\n  \"HEADER\": \"GitHub\",\n  \"BODY\":\"<span><p>GIT
-    HUB integration can be used as a datasource for Approval Gate as well as to configure
-    Spinnaker for GitHub.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
-    Name</strong>: User defined name for the GitHub Account<span class='noBr'>(Example:
-    opsmx-github)</span></li><li><strong>Token</strong>: GitHub personal access token.
-    You can find <a href='https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token'
+    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle on to propagate the change into
+    the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Container
+    Registry Host URL\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL
+    cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  }\n},\n\"GITHUB\":{\n
+    \ \"HEADER\": \"GitHub\",\n  \"BODY\":\"<span><p>GITHUB integration can be used
+    as a datasource for Approval Gate as well as to configure Spinnaker for GitHub.</p><p><strong>Fields</strong>:</p><ul
+    class='helpTextUl'><li><strong>Account Name</strong>: User-defined account name
+    for your GitHub access.<span class='noBr'>(Example: opsmx-github)</span></li><li><strong>URL</strong>:
+    Github's host address, such as https://github.com</li><li><strong>API URL</strong>:
+    Github's API endpoint host address, <span class='noBr'>such as https://api.github.com</span></li><li><strong>Token</strong>:
+    GitHub personal access token. You can find <a href='https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token'
     target='_blank'>here</a> how to generate personal access tokens. <span class='noBr'>(Example:
-    ghp_ln1eJK4yuomnY6JREp72IDJC4Hq6Sm)</span></li><li><strong>User Name</strong>: GitHub
-    User Name</li><li><strong>Connect to Spinnaker</strong>: Toggle to configure Spinnaker
-    for GitHub</li><li><strong>Permissions</strong>: Enable/disable access to the GIT
-    HUB account in Autopilot to specific usergroups</li></ul></span>\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"GitHub
-    URL\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL cannot be empty\",\n
-    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"GitHub
-    API base URL. Eg. https://api.github.com\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
-    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
-    \ \"TOKEN\":{\n    \"TOOLTIP\":\"GitHub token\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"GitHub
-    username\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User
-    Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    ghp_ln1eJK4yuomnY6JREp72IDJC4Hq6Sm)</span></li><li><strong>User Name</strong>: The
+    GitHub username</li><li><strong>Connect to Spinnaker</strong>: Toggle to configure
+    Spinnaker for GitHub</li><li><strong>Permissions</strong>: Enable/disable access
+    to the GITHUB account in Autopilot to specific user groups</li></ul></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your GitHub
+    access.\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Github's host address, such as https://github.com\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL cannot be empty\",\n
+    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"Github's
+    API endpoint host address, such as https://api.github.com\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"API URL cannot be empty\",\n      \"invalidUrl\": \"URL is
+    invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The user's token\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The
+    GitHub username\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
     \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to configure the
     resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"GITLAB\":{\n  \"HEADER\": \"GitLab\",\n  \"BODY\":\"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"User defined name for the GitLab account\",\n    \"VALIDATION_MESSAGE\":{\n
+    \ }\n},\n\"GITLAB\":{\n  \"HEADER\": \"GitLab\",\n  \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your GitLab access.</li><li><strong>Host
+    URL</strong>: GitLab's host address, such as https://gitlab.com</li><li><strong>Username</strong>:
+    The GitLab server username </li><li><strong>Token</strong>: The user's personal
+    access token. Please refer <a href='https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html'
+    target='_blank'>this document</a> for generating tokens.</li></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for your GitLab access.\",\n    \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
     other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
     \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"GitLab
-    Host URL\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL cannot
-    be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"APIBASEURL\":{\n
-    \   \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API URL
+    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"GitLab's
+    host address, such as https://gitlab.com\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host
+    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    \ \"APIBASEURL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
+    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    \ \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external resource confirms
+    the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"GitLab
+    token\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n
+    \   }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to
+    configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"GITREPO\":{\n  \"HEADER\": \"Git Repo\",\n  \"BODY\": \"<span><li><strong>Account
+    Name</strong>: User-defined account name for your Git Repo access.</li><li><strong>Authentication
+    Type</strong>: Select an authentication type that corresponds to the connection
+    credential parameter. Recommended using the user token method.</li></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your Git Repo
+    access.\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"DEPLOYMENT\":{\n    \"TOOLTIP\":\"This Halyard deployment will be used
+    for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"URL
     cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
-    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"GitLab token\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n    }\n
-    \ },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to configure
-    the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"GITREPO\":{\n  \"HEADER\": \"Git Repo\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"DEPLOYMENT\":{\n    \"TOOLTIP\":\"This
-    Halyard deployment will be used for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n
-    \   }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external
-    resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n
-    \ \"URL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
+    \   \"TOOLTIP\":\"Select an authentication type that corresponds to the connection
+    credential parameter. Recommended using the user token method.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"URL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
     URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
     \ \"TOKEN\":{\n    \"TOOLTIP\":\"Git token\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
     cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"Git password\",\n
@@ -2109,17 +2208,23 @@ data:
     \"User Name cannot start with numbers\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
     \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
     Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"HELM\":{\n  \"HEADER\":
-    \"Helm\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of
-    the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    \"Helm\",\n  \"BODY\": \"<span><li><strong>Account Name</strong>: User-defined account
+    name for target Helm repository access.</li><li><strong>Repository</strong>: Helm
+    Chart Repository’s HTTP endpoint.</li><li><strong>Authentication Type</strong>:
+    Select an authentication type that corresponds to the connection credential parameter.</li><li><strong>Connect
+    to Spinnaker</strong>: Toggle ON to propagate the change to Spinnaker Toggle on
+    to propagate the change into the CD Tool.</li></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for target Helm repository access\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
+    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"REPOSITORY\":{\n    \"TOOLTIP\":\"URL of the Helm Chart Repository\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"URL cannot be empty\",\n      \"invalidUrl\":
-    \"URL is invalid\"\n    }\n  },\n  \"DEPLOYMENT\":{\n    \"TOOLTIP\":\"This Halyard
-    deployment will be used for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   \n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the
-    external resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"REPOSITORY\":{\n    \"TOOLTIP\":\"Helm Chart Repository’s HTTP endpoint\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Repository cannot be empty\",\n
+    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"DEPLOYMENT\":{\n    \"TOOLTIP\":\"This
+    Halyard deployment will be used for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n
+    \   \n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication
+    type that corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
     \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
     cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"User Name\",\n
     \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User Name cannot
@@ -2127,61 +2232,90 @@ data:
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
     \ \"PASSWORD\": {\n    \"TOOLTIP\": \"Password\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"PASSWORDCOMMAND\": {\n    \"TOOLTIP\": \"Command to retrieve docker
-    token/password, commands must be available in environment\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"FILE\": {\n    \"TOOLTIP\": \"The path to a file containing your
-    docker password in plaintext (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\":
-    {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle
-    to configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"HTTP\":{\n  \"HEADER\": \"Http\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
-    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"HTTP
-    basic auth User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    \     \"required\" : \"Password cannot be empty\"\n    }\n  },\n  \"PASSWORDCOMMAND\":
+    {\n    \"TOOLTIP\": \"Command to retrieve docker token/password, commands must be
+    available in environment\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"FILE\":
+    {\n    \"TOOLTIP\": \"The path to a file containing your docker password in plaintext
+    (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n
+    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle on to propagate the change into
+    the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"HTTP\":{\n  \"HEADER\":
+    \"Http\",\n  \"BODY\": \"<span><li><strong>Account Name</strong>: User-defined account
+    name for HTTP protocol-based artifacts</li><li><strong>Authentication Type</strong>:
+    Select an authentication type that corresponds to the connection credential parameter.</li><li><strong>Connect
+    to Spinnaker</strong>: Toggle on to propagate the change into the CD Tool.</li></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for HTTP protocol-based
+    artifacts\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication type
+    that corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
+    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"HTTP basic auth
+    User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User
+    Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
     \ \"PASSWORD\": {\n    \"TOOLTIP\": \"Password\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"PASSWORDCOMMAND\": {\n    \"TOOLTIP\": \"Command to retrieve docker
-    token/password, commands must be available in environment\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"FILE\": {\n    \"TOOLTIP\": \"The path to a file containing your
-    docker password in plaintext (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\":
-    {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle
-    to configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"GCS\":{\n  \"HEADER\": \"GCS\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
-    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"FILE\": {\n    \"TOOLTIP\": \"JSON service
-    account that Spinnaker will use as credentials\",\n    \"VALIDATION_MESSAGE\": {\n
-    \   }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to
-    configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"ECR\":{\n  \"HEADER\": \"ECR\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"REPOSITORIES\":{\n
-    \   \"TOOLTIP\":\"An optional list of repositories to cache images from\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"cannotContainSpace\":\"Repository cannot contain space\",\n      \"startingFromNumber\":
-    \"Repository cannot start with numbers\"\n    }\n  },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The
-    registry address you want to pull and deploy images from. For example: gcr.io\",\n
-    \   \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"GROUPMEMBERSHIP\":{\n    \"TOOLTIP\":\"A
-    user must be a member of at least one specified group in order to make changes to
-    this account’s cloud resources\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository
+    \     \"required\" : \"Password cannot be empty\"\n    }\n  },\n  \"PASSWORDCOMMAND\":
+    {\n    \"TOOLTIP\": \"Command to retrieve docker token/password, commands must be
+    available in environment\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"FILE\":
+    {\n    \"TOOLTIP\": \"The path to a file containing your docker password in plaintext
+    (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n
+    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle on to propagate the change into
+    the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"GCS\":{\n  \"HEADER\":
+    \"GCS\",\n  \"BODY\": \"<span><p><strong>Fields</strong>:</p><ul class='helpTextUl'></ul><li><strong>Account
+    Name</strong>: User-defined account name for your Google Cloud Storage access.</li><li><strong>Authentication
+    Type</strong>: Select an authentication type that corresponds to the connection
+    credential parameter. </li><li><strong>Json-Key file</strong>: Configures Google
+    service account’s json file </li><li><strong>Connect to Spinnaker</strong>: Toggle
+    on to propagate the change into the CD Tool. </li></ul></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for your Google Cloud Storage access.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
+    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication type
+    that corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"FILE\": {\n    \"TOOLTIP\": \"Configures Google service account’s json
+    file\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle
+    on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"ECR\":{\n  \"HEADER\": \"ECR\",\n  \"BODY\": \"<span><p><strong>Fields</strong>:</p><ul
+    class='helpTextUl'><li><strong>Account Name</strong>: User-defined account name
+    for your ECR Docker registry access.</li><li><strong>Registry URL</strong>: The
+    registry URL from which you want to pull and deploy images. <span class='noBr'>
+    For example:https://aws_account_id.dkr.ecr.region.amazonaws.com</span></li><li><strong>Email</strong>:
+    Users docker registry email. If no value is specified, the default value of fake.email@spinnaker.io
+    will be used.</li><li><strong>Repositories</strong>: An optional list of repositories
+    to cache images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. <span class='noBr'> Example:
+    library/ubuntu (Public repositories are prefixed with library/)</span></li><li><strong>Authentication
+    Type</strong>: Select an authentication type that corresponds to the connection
+    credential parameter.</li><li><strong>Connect to Spinnaker</strong>: Toggle on to
+    propagate the change into the CD Tool.</li></ul></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for your ECR Docker registry access.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
+    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"REPOSITORIES\":{\n    \"TOOLTIP\":\"Users docker registry email. If no
+    value is specified, the default value of fake.email@spinnaker.io will be used.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository cannot contain
+    space\",\n      \"startingFromNumber\": \"Repository cannot start with numbers\"\n
+    \   }\n  },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The registry URL from which
+    you want to pull and deploy images. For example:https://aws_account_id.dkr.ecr.region.amazonaws.com\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\" : \"Registry URL cannot be empty\"\n
+    \   }\n  },\n  \"GROUPMEMBERSHIP\":{\n    \"TOOLTIP\":\"A user must be a member
+    of at least one specified group in order to make changes to this account’s cloud
+    resources\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository
     cannot contain space\"\n    }\n  },\n  \"REGION\": {\n    \"TOOLTIP\": \"AWS region\"\n
-    \ },\n  \"EMAIL\":{\n    \"TOOLTIP\":\"Your docker registry email\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"email\":\"Email Id is invalid\",\n      \"required\":\"Email Id cannot be
-    empty\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the
-    external resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"EMAIL\":{\n    \"TOOLTIP\":\"An optional list of repositories to cache
+    images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. Example: library/ubuntu (Public
+    repositories are prefixed with library/)\",\n    \"VALIDATION_MESSAGE\":{\n      \"email\":\"Email
+    Id is invalid\",\n      \"required\":\"Email Id cannot be empty\"\n    }\n  },\n
+    \ \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication type that
+    corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
     \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
     cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"Your docker
     registry username\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
@@ -2191,87 +2325,107 @@ data:
     \ \"PASSWORD\": {\n    \"TOOLTIP\": \"Your docker registry password\",\n    \"VALIDATION_MESSAGE\":{\n
     \   }\n  },\n  \"PASSWORDCOMMAND\": {\n    \"TOOLTIP\": \"Command to retrieve docker
     token/password, commands must be available in environment\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"FILE\": {\n    \"TOOLTIP\": \"The path to a file containing your
-    docker password in plaintext (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\":
-    {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle
-    to configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"PUBSUB\":{\n  \"HEADER\": \"PUBSUB\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"PROJECTNAME\": {\n
-    \   \"TOOLTIP\": \"The name of the GCP project your subscription lives in\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"cannotContainSpace\":\"Project Name cannot contain space\",\n      \"required\":\"Project
-    Name cannot be empty\"\n    }\n  },\n  \"SUBSCRIPTIONNAME\": {\n    \"TOOLTIP\":
-    \"The name of the subscription to listen to. This identifier does not include the
-    name of the project, and must already be configured for Spinnaker to work.\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Subscription Name cannot
-    contain space\",\n      \"required\":\"Subscription Name cannot be empty\"\n    }\n
-    \ },\n  \"MESSAGEFORMAT\": {\n    \"TOOLTIP\":\"Supporting Message Formats: GCB,GCS,GCR,CUSTOM\",\n
-    \   \"VALIDATION_MESSAGE\": {}\n  },\n  \"TEMPLATEFILE\": {\n    \"TOOLTIP\":\"Applicable
-    only for CUSTOM message format\",\n    \"VALIDATION_MESSAGE\": {}\n  },\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
-    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"FILE\": {\n    \"TOOLTIP\": \"JSON service
-    account that Spinnaker will use as credentials\",\n    \"VALIDATION_MESSAGE\": {\n
-    \   }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to
-    configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"GCB\":{\n  \"HEADER\": \"GCB\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"PROJECTNAME\": {\n
-    \   \"TOOLTIP\": \"The name of the GCP project in which to trigger and monitor builds\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Project Name cannot
-    contain space\",\n      \"required\":\"Project Name cannot be empty\"\n    }\n  },\n
-    \ \"SUBSCRIPTIONNAME\": {\n    \"TOOLTIP\": \"The name of the PubSub subscription
-    on which to listen for build changes\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Subscription
-    Name cannot contain space\",\n      \"required\":\"Subscription Name cannot be empty\"\n
-    \   }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external
+    \     \"required\" : \"Password-command cannot be empty\"\n    }\n  },\n  \"FILE\":
+    {\n    \"TOOLTIP\": \"The path to a file containing your docker password in plaintext
+    (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n
+    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle on to propagate the change into
+    the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"PUBSUB\":{\n  \"HEADER\":
+    \"PUBSUB\",\n  \"BODY\": \"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Google Cloud Pub/Sub access.</li></span>\",\n  \"ACCOUNTNAME\":{\n
+    \   \"TOOLTIP\":\"User-defined account name for your Google Cloud Pub/Sub access.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
+    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"PROJECTNAME\": {\n    \"TOOLTIP\": \"The name of the GCP project your
+    subscription lives in\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Project
+    Name cannot contain space\",\n      \"required\":\"Project Name cannot be empty\"\n
+    \   }\n  },\n  \"SUBSCRIPTIONNAME\": {\n    \"TOOLTIP\": \"The name of the subscription
+    to listen to. This identifier does not include the name of the project, and must
+    already be configured for Spinnaker to work.\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"cannotContainSpace\":\"Subscription Name cannot contain space\",\n      \"required\":\"Subscription
+    Name cannot be empty\"\n    }\n  },\n  \"MESSAGEFORMAT\": {\n    \"TOOLTIP\":\"Supporting
+    Message Formats: GCB,GCS,GCR,CUSTOM\",\n    \"VALIDATION_MESSAGE\": {}\n  },\n  \"TEMPLATEFILE\":
+    {\n    \"TOOLTIP\":\"Applicable only for CUSTOM message format\",\n    \"VALIDATION_MESSAGE\":
+    {}\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external
     resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n
     \ \"FILE\": {\n    \"TOOLTIP\": \"JSON service account that Spinnaker will use as
-    credentials\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"GCB
-    User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User
-    Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    credentials\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
+    \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
+    Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"GCB\":{\n  \"HEADER\":
+    \"GCB\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"The name of
+    the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"PROJECTNAME\": {\n    \"TOOLTIP\": \"The name of the GCP project in which
+    to trigger and monitor builds\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Project
+    Name cannot contain space\",\n      \"required\":\"Project Name cannot be empty\"\n
+    \   }\n  },\n  \"SUBSCRIPTIONNAME\": {\n    \"TOOLTIP\": \"The name of the PubSub
+    subscription on which to listen for build changes\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"cannotContainSpace\":\"Subscription Name cannot contain space\",\n      \"required\":\"Subscription
+    Name cannot be empty\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select
+    how the external resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"FILE\": {\n    \"TOOLTIP\": \"JSON service account that Spinnaker will
+    use as credentials\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n  \"USERNAME\":{\n
+    \   \"TOOLTIP\":\"GCB User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
     \ \"PASSWORD\": {\n    \"TOOLTIP\": \"Password\",\n    \"VALIDATION_MESSAGE\":{\n
     \   }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to
     configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"GCR\":{\n  \"HEADER\": \"GCR\",\n  \"BODY\": \"\",\n  \"ACCOUNTNAME\":{\n
-    \   \"TOOLTIP\":\"The name of the account to operate on\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
-    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"REPOSITORIES\":{\n    \"TOOLTIP\":\"An
-    optional list of repositories to cache images from\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"cannotContainSpace\":\"Repository cannot contain space\",\n      \"startingFromNumber\":
-    \"Repository cannot start with numbers\"\n    }\n  },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The
-    registry address you want to pull and deploy images from. For example: gcr.io\",\n
-    \   \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"REQUIREDGROUPMEMBERSHIP\":{\n    \"TOOLTIP\":\"A
-    user must be a member of at least one specified group in order to make changes to
-    this account’s cloud resources\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository
-    cannot contain space\"\n    }\n  },\n  \"EMAIL\":{\n    \"TOOLTIP\":\"Your docker
-    registry email\",\n    \"VALIDATION_MESSAGE\":{\n      \"email\":\"Email Id is invalid\",\n
-    \     \"required\":\"Email Id cannot be empty\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"API URL cannot be empty\",\n
-    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n    }\n
-    \ },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"GCR User Name\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"User Name cannot contain special characters other
-    than - and _\",\n      \"cannotContainSpace\":\"User Name cannot contain space\",\n
-    \     \"required\":\"User Name cannot be empty\",\n      \"startingFromNumber\":
-    \"User Name cannot start with numbers\"\n    }\n  },\n  \"PASSWORD\": {\n    \"TOOLTIP\":
-    \"Your docker registry password\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n
-    \ \"PASSWORDCOMMAND\": {\n    \"TOOLTIP\": \"Command to retrieve docker token/password,
-    commands must be available in environment\",\n    \"VALIDATION_MESSAGE\":{\n    }\n
-    \ },\n  \"FILE\": {\n    \"TOOLTIP\": \"The path to a file containing your docker
-    password in plaintext (not a docker/config.json file)\",\n    \"VALIDATION_MESSAGE\":
-    {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle
-    to configure the resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"GCR\":{\n  \"HEADER\": \"GCR\",\n  \"BODY\": \"<span><p><strong>Fields</strong>:</p><ul
+    class='helpTextUl'><li><strong>Account Name</strong>: User-defined account name
+    for your GCR Docker registry access.</li><li><strong>Registry URL</strong>: The
+    registry URL from which you want to pull and deploy images. <span class='noBr'>
+    For example: https://gcr.io - Global GCR, https://[us|eu|asia].gcr.io - Regional
+    GCR</span></li><li><strong>Email</strong>: Users docker registry email. If no value
+    is specified, the default value of fake.email@spinnaker.io will be used.</li><li><strong>Repositories</strong>:
+    An optional list of repositories to cache images from. If not provided, Spinnaker
+    will try to read the list of accessible repositories from the registries _catalog
+    endpoint. <span class='noBr'> Example: library/ubuntu (Public repositories are prefixed
+    with library/)</span></li><li><strong>Authentication Type</strong>: Select an authentication
+    type that corresponds to the connection credential parameter.</li><li><strong>Connect
+    to Spinnaker</strong>: Toggle on to propagate the change into the CD Tool.</li></ul></span>\",\n
+    \ \"ACCOUNTNAME\":{\n    \"TOOLTIP\":\"User-defined account name for your GCR Docker
+    registry access.\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \ },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication type
+    that corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ },\n  \"REPOSITORIES\":{\n    \"TOOLTIP\":\"An optional list of repositories to
+    cache images from. If not provided, Spinnaker will try to read the list of accessible
+    repositories from the registries _catalog endpoint. Example: library/ubuntu (Public
+    repositories are prefixed with library/)\",\n    \"VALIDATION_MESSAGE\":{\n      \"cannotContainSpace\":\"Repository
+    cannot contain space\",\n      \"startingFromNumber\": \"Repository cannot start
+    with numbers\"\n    }\n  },\n  \"REGISTRYURL\":{\n    \"TOOLTIP\":\"The registry
+    URL from which you want to pull and deploy images. For example: https://gcr.io -
+    Global GCR, https://[us|eu|asia].gcr.io - Regional GCR\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\" : \"Registry URL cannot be empty\"\n    }\n  },\n  \"REQUIREDGROUPMEMBERSHIP\":{\n
+    \   \"TOOLTIP\":\"A user must be a member of at least one specified group in order
+    to make changes to this account’s cloud resources\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"cannotContainSpace\":\"Repository cannot contain space\"\n    }\n  },\n
+    \ \"EMAIL\":{\n    \"TOOLTIP\":\"Users docker registry email. If no value is specified,
+    the default value of fake.email@spinnaker.io will be used.\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"email\":\"Email Id is invalid\",\n      \"required\":\"Email Id cannot be
+    empty\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"API URL cannot be empty\",\n      \"invalidUrl\": \"URL is
+    invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"GCR
+    User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User
+    Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
+    \ \"PASSWORD\": {\n    \"TOOLTIP\": \"Your docker registry password\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\" : \"Password cannot be empty\"\n    }\n  },\n  \"PASSWORDCOMMAND\":
+    {\n    \"TOOLTIP\": \"Command to retrieve docker token/password, commands must be
+    available in environment\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\" :
+    \"Password-command cannot be empty\"\n    }\n  },\n  \"FILE\": {\n    \"TOOLTIP\":
+    \"The path to a file containing your docker password in plaintext (not a docker/config.json
+    file)\",\n    \"VALIDATION_MESSAGE\": {\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
+    \   \"TOOLTIP\":\"Toggle on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
     \ }\n},\n\"BAMBOO\":{\n    \"HEADER\": \"Bamboo CI\",\n    \"BODY\":\" <span><p>Bamboo
     CI integration can be used as a datasource for Approval Gate.</p><p><strong>Fields</strong>:</p><ul
     class='helpTextUl'> <li><strong>Name</strong>: User defined name for the Bamboo
@@ -2301,25 +2455,30 @@ data:
     \       \"required\":\"Password cannot be empty\"\n      }\n    }\n  },\n  \"JENKINS\":{\n
     \   \"HEADER\":\"Jenkins\",\n    \"BODY\":\"<span><p>Jenkins integration can be
     used as a datasource for Approval Gate as well as to configure Spinnaker for Jenkins.</p><p><strong>Fields</strong>:</p><ul
-    class='helpTextUl'><li><strong>Account Name</strong>: User defined name for the
-    Jenkins Account <span class='noBr'>(Example: opsmx-jenkins)</span></li><li><strong>Host
-    URL</strong>: Jenkins URL <span class='noBr'>(Example: https://xyz.my-jenkins.com/jenkins)</span></li><li><strong>Authentication
-    Type</strong>: can be Token or User Name/Password    </li><li><strong>Token</strong>:
-    Jenkins personal access token. You can find <a href='https://www.jenkins.io/doc/book/using/using-credentials/'
-    target='_blank'>here</a> how to generate personal access tokens. <span>(Example:
-    77d67609a841b1811a114b7fbfa109b3c2)</span></li><li><strong>User Name</strong>: Jenkins
-    User Name</li><li><strong>Password</strong>: Jenkins Password</li><li><strong>Connect
+    class='helpTextUl'><li><strong>Account Name</strong>: User-defined account name
+    for your Jenkins access. <span class='noBr'>(Example: opsmx-jenkins)</span></li><li><strong>Host
+    URL</strong>: Jenkins host address, <span class='noBr'>such as https://jenkins.opsmx.net</span></li><li><strong>Authentication
+    Type</strong>: Select an authentication type that corresponds to the connection
+    credential parameter. It is preferable to use token authentication with username
+    and token. </li><li><strong>Token</strong>: Jenkins personal access token. You can
+    find <a href='https://www.jenkins.io/doc/book/using/using-credentials/' target='_blank'>here</a>
+    how to generate personal access tokens. <span>(Example: 77d67609a841b1811a114b7fbfa109b3c2)</span></li><li><strong>CSRF</strong>:
+    Recommended to toggle on the CSRF (Cross-Site Request Forgery) flag</li><li><strong>User
+    Name</strong>: Jenkins User Name</li><li><strong>Password</strong>: Jenkins Password</li><li><strong>Connect
     to Spinnaker</strong>: Toggle to configure Spinnaker for Jenkins</li><li><strong>Permissions</strong>:
-    Enable/disable access to the Jenkins account in Autopilot to specific usergroups</li></ul></span>\",\n
-    \   \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"The name of the account to operate on\",\n
-    \     \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name cannot
-    contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Enable/disable access to the Jenkins account in Autopilot to specific user groups</li></ul></span>\",\n
+    \   \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User-defined account name for your Jenkins
+    access.\",\n      \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \   },\n    \"HOSTURL\":{\n      \"TOOLTIP\":\"Jenkins URL\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Host URL cannot be empty\",\n        \"invalidUrl\": \"URL
-    is invalid\"\n      }\n    },\n    \"AUTHENTICATIONTYPE\":{\n      \"TOOLTIP\":\"Select
-    how the external resource confirms the user credentials\",\n      \"VALIDATION_MESSAGE\":{}\n
+    \   },\n    \"HOSTURL\":{\n      \"TOOLTIP\":\"Jenkins host address, such as https://jenkins.opsmx.net\",\n
+    \     \"VALIDATION_MESSAGE\":{\n        \"required\":\"Host URL cannot be empty\",\n
+    \       \"invalidUrl\": \"URL is invalid\"\n      }\n    },\n    \"CSRFFLAG\":{\n
+    \     \"TOOLTIP\":\"Recommended to toggle on the CSRF (Cross-Site Request Forgery)
+    flag.\"\n    },\n    \"AUTHENTICATIONTYPE\":{\n      \"TOOLTIP\":\"Select an authentication
+    type that corresponds to the connection credential parameter. It is preferable to
+    use token authentication with username and token.\",\n      \"VALIDATION_MESSAGE\":{}\n
     \   },\n    \"TOKEN\":{\n      \"TOOLTIP\":\"Your Jenkins token\",\n      \"VALIDATION_MESSAGE\":{\n
     \       \"required\":\"Token cannot be empty\"\n      }\n    },\n    \"USERNAME\":{\n
     \     \"TOOLTIP\":\"Your Jenkins username\",\n      \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\":
@@ -2396,7 +2555,7 @@ data:
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \   \n    },\n    \"API_KEY\":{\n      \"TOOLTIP\":\"DATADOG Api Key\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Application Key cannot be empty\"\n      }\n    },\n    \"APPLICATION_KEY\":{\n
+    \       \"required\":\"API key cannot be empty\"\n      }\n    },\n    \"APPLICATION_KEY\":{\n
     \     \"TOOLTIP\":\"DATADOG Application Key\",\n      \"VALIDATION_MESSAGE\":{\n
     \       \"required\":\"Application Key cannot be empty\"\n      }\n    }\n  },\n
     \ \"DYNATRACE\":{\n    \"HEADER\": \"Dynatrace\",\n    \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n
@@ -2409,134 +2568,172 @@ data:
     cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n    },\n
     \   \"API_TOKEN\":{\n      \"TOOLTIP\":\"Dynatrace Personal Access Token\",\n      \"VALIDATION_MESSAGE\":{\n
     \       \"required\":\"Api Token cannot be empty\"\n      }\n    }\n  },\n  \"ELASTICSEARCH\":{\n
-    \   \"HEADER\": \"Elasticsearch\",\n    \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n
-    \     \"TOOLTIP\":\"User defined name for the Elasticsearch account\",\n      \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n    },\n    \"ENDPOINT\":{\n
-    \     \"TOOLTIP\":\"ElasticSearch End Point\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Elastic End Point cannot be empty\",\n        \"invalidUrl\":
-    \"URL is invalid\"\n      }\n    },\n    \"USERNAME\":{\n      \"TOOLTIP\":\"ElasticSearch
-    User Name\",\n      \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\": \"User
-    Name cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"User
-    Name cannot contain space\",\n        \"startingFromNumber\": \"User Name cannot
-    start with numbers\"\n      }\n    },\n    \"PASSWORD\":{\n      \"TOOLTIP\":\"ElasticSearch
-    Password\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Password cannot
-    be empty\"\n      }\n    },\n    \"KIBANAENDPOINT\":{\n      \"TOOLTIP\":\"ElasticSearch
-    Kibana End Point\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Kibana
-    End Point cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n
-    \   },\n    \"KIBANAUSERNAME\":{\n      \"TOOLTIP\":\"ElasticSearch Kibana User
-    Name\",\n      \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\": \"Kibana
-    User Name cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"Kibana
-    User Name cannot contain space\",\n        \"required\":\"Kibana User Name cannot
-    be empty\",\n        \"startingFromNumber\": \"Kibana User Name cannot start with
-    numbers\"\n      }\n    },\n    \"KIBANAPASSWORD\":{\n      \"TOOLTIP\":\"ElasticSearch
-    Kibana Password\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Kibana
-    Password cannot be empty\"\n      }\n    }\n  },\n    \"GRAPHITE\":{\n      \"HEADER\":
-    \"Graphite\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the Graphite account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"URL\":{\n        \"TOOLTIP\":\"Graphite End Point\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"End Point cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      }\n    },\n    \"GRAYLOG\":{\n      \"HEADER\":
-    \"GRAYLOG\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the GRAYLOG account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"GrayLog End Point\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"End Point cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"GrayLog
-    Personal Access Token\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token
-    cannot be empty\"\n        }\n      }\n    },\n    \"NEWRELIC\":{\n      \"HEADER\":
-    \"New Relic\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the New Relic account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"APIKEY\":{\n        \"TOOLTIP\":\"NewRelic Api Key\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Token cannot be empty\"\n        }\n      },\n      \"APPLICATIONKEY\":{\n
-    \       \"TOOLTIP\":\"NewRelic Application Key\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Token cannot be empty\"\n        }\n      },\n      \"ACCOUNTID\":{\n
-    \       \"TOOLTIP\":\"NewRelic Account Id\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Token cannot be empty\"\n        }\n      },\n      \"QUERYKEY\":{\n
-    \       \"TOOLTIP\":\"NewRelic Query Key\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Token cannot be empty\"\n        }\n      }\n    },\n    \"PROMETHEUS\":{\n
-    \     \"HEADER\": \"Prometheus\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
-    \       \"TOOLTIP\":\"User defined name for the Prometheus account\",\n        \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"ENDPOINT\":{\n
-    \       \"TOOLTIP\":\"Prometheus End Point\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"End Point cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      },\n      \"USERNAME\":{\n        \"TOOLTIP\":\"Prometheus
-    User Name\",\n        \"VALIDATION_MESSAGE\":{\n          \"noSpecialCharacters\":
-    \"User Name cannot contain special characters other than - and _\",\n          \"cannotContainSpace\":\"User
-    Name cannot contain space\",\n          \"required\":\"User Name cannot be empty\",\n
-    \         \"startingFromNumber\": \"User Name cannot start with numbers\"\n        }\n
-    \     },\n      \"PASSWORD\":{\n        \"TOOLTIP\":\"Prometheus Password\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Password cannot be empty\"\n        }\n      }\n    },\n
-    \   \"SPLUNK\":{\n      \"HEADER\": \"Splunk\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
-    \       \"TOOLTIP\":\"User defined name for the Splunk account\",\n        \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"END_POINT\":{\n
-    \       \"TOOLTIP\":\"Splunk Splunk URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Splunk
-    Url  cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     },\n      \"PASSWORD\":{\n        \"TOOLTIP\":\"Splunk Password\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Password cannot be empty\"\n        }\n      },\n      \"USER_NAME\":{\n
-    \       \"TOOLTIP\":\"Splunk User Name\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"DASHBOARD_ENDPOINT\":{\n        \"TOOLTIP\":\"Splunk DashBoard
-    URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Splunk DashBoard
-    Url cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     }\n    },\n    \"STACKDRIVER\":{\n      \"HEADER\": \"Stackdriver\",\n      \"BODY\":\"\",\n
-    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User defined name for the Stackdriver
-    account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    \   \"HEADER\": \"Elasticsearch\",\n    \"BODY\":\"<span><li><strong>Account Name</strong>:
+    User-defined account name for your Elasticsearch access.</li><li><strong>Endpoint</strong>:
+    Elasticsearch host address, from which you access the Elasticsearch</li><li><strong>Username</strong>:
+    Elasticsearch username </li><li><strong>Password</strong>: Elasticsearch password</li><li><strong>Kibana
+    Endpoint</strong>: Elasticsearch Kibana host address, from which you access the
+    Elasticsearch Kibana</li><li><strong>Kibana username</strong>: Elasticsearch Kibana
+    username</li><li><strong>Kibana Password</strong>: Elasticsearch Kibana password</li><span>\",\n
+    \   \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User-defined account name for your Elasticsearch
+    access.\",\n      \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
     Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"KEY_FILE\":{\n        \"TOOLTIP\":\"Stackdriver Encrypted Key
-    file\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Encrypted Key
-    File cannot be empty\"\n        }\n      }\n    },\n    \"SUMOLOGIC\":{\n      \"HEADER\":
-    \"Sumo Logic\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the Sumologic account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \   },\n    \"ENDPOINT\":{\n      \"TOOLTIP\":\"Elasticsearch host address, from
+    which you access the Elasticsearch\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Elastic
+    End Point cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n
+    \   },\n    \"USERNAME\":{\n      \"TOOLTIP\":\"Elasticsearch username\",\n      \"VALIDATION_MESSAGE\":{\n
+    \       \"noSpecialCharacters\": \"User Name cannot contain special characters other
+    than - and _\",\n        \"cannotContainSpace\":\"User Name cannot contain space\",\n
+    \       \"startingFromNumber\": \"User Name cannot start with numbers\"\n      }\n
+    \   },\n    \"PASSWORD\":{\n      \"TOOLTIP\":\"Elasticsearch password\",\n      \"VALIDATION_MESSAGE\":{\n
+    \       \"required\":\"Password cannot be empty\"\n      }\n    },\n    \"KIBANAENDPOINT\":{\n
+    \     \"TOOLTIP\":\"Elasticsearch Kibana host address, from which you access the
+    Elasticsearch Kibana\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Kibana
+    End Point cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n
+    \   },\n    \"KIBANAUSERNAME\":{\n      \"TOOLTIP\":\"Elasticsearch Kibana username\",\n
+    \     \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\": \"Kibana User Name
+    cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"Kibana
+    User Name cannot contain space\",\n        \"required\":\"Kibana User Name cannot
+    be empty\",\n        \"startingFromNumber\": \"Kibana User Name cannot start with
+    numbers\"\n      }\n    },\n    \"KIBANAPASSWORD\":{\n      \"TOOLTIP\":\"Elasticsearch
+    Kibana password\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Kibana
+    Password cannot be empty\"\n      }\n    }\n  },\n    \"GRAPHITE\":{\n      \"HEADER\":
+    \"Graphite\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Graphite access.</li><li><strong>Endpoint</strong>: Graphite
+    host address, from which you access the Graphite </li></span>\",\n      \"ACCOUNTNAME\":{\n
+    \       \"TOOLTIP\":\"User-defined account name for your Graphite access.\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"URL\":{\n        \"TOOLTIP\":\"Graphite
+    host address, from which you access the Graphite\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"End Point cannot be empty\",\n          \"invalidUrl\":
+    \"URL is invalid\"\n        }\n      }\n    },\n    \"GRAYLOG\":{\n      \"HEADER\":
+    \"GRAYLOG\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Graylog access.</li><li><strong>Endpoint</strong>: Graylog
+    host address, from which you access the Graylog </li><li><strong>Token</strong>:
+    The user's token </li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your Graylog access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
     \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"Graylog host address, from
+    which you access the Graylog\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
+    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    \     },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"GrayLog Personal Access Token\",\n
+    \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot be empty\"\n
+    \       }\n      }\n    },\n    \"NEWRELIC\":{\n      \"HEADER\": \"New Relic\",\n
+    \     \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined account name
+    for your NewRelic access.</li><li><strong>Api Key</strong>: The user's token to
+    authenticate with Newrelic</li><li><strong>Application Key</strong>: The application
+    key identifies which account the incoming data belongs to.</li><li><strong>Account
+    ID</strong>: Provide account ID to identify the account </li><li><strong>Query Key</strong>:
+    Provide a query key to filter the data </li></span>\",\n      \"ACCOUNTNAME\":{\n
+    \       \"TOOLTIP\":\"User-defined account name for your NewRelic access.\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"APIKEY\":{\n
+    \       \"TOOLTIP\":\"NewRelic Api Key\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"API
+    key cannot be empty\"\n        }\n      },\n      \"APPLICATIONKEY\":{\n        \"TOOLTIP\":\"The
+    application key identifies which account the incoming data belongs to.\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"Application Key cannot be empty\"\n        }\n      },\n
+    \     \"ACCOUNTID\":{\n        \"TOOLTIP\":\"Provide account ID to identify the
+    account\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Account Id
+    cannot be empty\"\n        }\n      },\n      \"QUERYKEY\":{\n        \"TOOLTIP\":\"Provide
+    a query key to filter the data\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Query
+    Key cannot be empty\"\n        }\n      }\n    },\n    \"PROMETHEUS\":{\n      \"HEADER\":
+    \"Prometheus\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Prometheus access.</li><li><strong>Endpoint</strong>: Prometheus
+    host address, from which you access the Prometheus</li><li><strong>Username</strong>:
+    Prometheus username</li><li><strong>Password</strong>: Prometheus password</li></span>\",\n
+    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined account name for your
+    Prometheus access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"Prometheus host address, from
+    which you access the Prometheus\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
+    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    \     },\n      \"USERNAME\":{\n        \"TOOLTIP\":\"Prometheus username\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"noSpecialCharacters\": \"User Name cannot contain special characters
+    other than - and _\",\n          \"cannotContainSpace\":\"User Name cannot contain
+    space\",\n          \"required\":\"User Name cannot be empty\",\n          \"startingFromNumber\":
+    \"User Name cannot start with numbers\"\n        }\n      },\n      \"PASSWORD\":{\n
+    \       \"TOOLTIP\":\"Prometheus password\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"Password cannot be empty\"\n        }\n      }\n    },\n
+    \   \"SPLUNK\":{\n      \"HEADER\": \"Splunk\",\n      \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your Splunk access.</li><li><strong>Splunk
+    Url</strong>: Splunk host address, from which you access the Splunk</li><li><strong>Username</strong>:
+    The Splunk's username</li><li><strong>Password</strong>: Splunk's password</li><li><strong>Splunk
+    DashBoard Url </strong>: Splunk Dashboard URL that you want to access </li><span>\",\n
+    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined account name for your
+    Splunk access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \     },\n      \"END_POINT\":{\n        \"TOOLTIP\":\"Splunk host address, from
+    which you access the Splunk\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Splunk
+    Url  cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    \     },\n      \"PASSWORD\":{\n        \"TOOLTIP\":\"Splunk's password\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"Password cannot be empty\"\n        }\n      },\n      \"USER_NAME\":{\n
+    \       \"TOOLTIP\":\"Splunk's user name\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"DASHBOARD_ENDPOINT\":{\n
+    \       \"TOOLTIP\":\"Splunk Dashboard URL that you want to access\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"Splunk DashBoard Url cannot be empty\",\n          \"invalidUrl\":
+    \"URL is invalid\"\n        }\n      }\n    },\n    \"STACKDRIVER\":{\n      \"HEADER\":
+    \"Stackdriver\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
+    defined name for the Stackdriver account\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"KEY_FILE\":{\n
+    \       \"TOOLTIP\":\"Stackdriver Encrypted Key file\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"Encrypted Key File cannot be empty\"\n        }\n      }\n
+    \   },\n    \"SUMOLOGIC\":{\n      \"HEADER\": \"Sumo Logic\",\n      \"BODY\":\"\",\n
+    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User defined name for the Sumologic
+    account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
+    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \     },\n      \"ACCESSID\":{\n        \"TOOLTIP\":\"sumologic Access Id. You can
     generate Access Id (Administration > Security > Access Keys)\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"Access Id cannot be empty\"\n        }\n      },\n      \"ACCESSKEY\":{\n
     \       \"TOOLTIP\":\"sumologic Access Key. You can generate Access Id (Administration
-    > Security > Access Keys)\",\n        \"VALIDATION_MEeSSAGE\":{\n          \"required\":\"Access
-    Key cannot be empty\"\n        }\n      },\n      \"ZONE\":{\n        \"TOOLTIP\":\"sumologic
+    > Security > Access Keys)\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Access
+    key cannot be empty\"\n    }\n      },\n      \"ZONE\":{\n        \"TOOLTIP\":\"sumologic
     Zone\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Zone
     cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Zone
     cannot contain space\",\n      \"required\":\"Zone cannot be empty\",\n      \"startingFromNumber\":
     \"Zone cannot start with numbers\"\n    }\n      }\n    },\n    \n    \"VMWARETANZU\":{\n
-    \     \"HEADER\": \"VMWare Tanzu Observability\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
-    \       \"TOOLTIP\":\"User defined name for the VMWare Tanzu Observability account\",\n
-    \       \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name
-    cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n       \"END_POINT\":{\n        \"TOOLTIP\":\"VMWare Tanzu Observability
-    URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Url cannot be
-    empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n      \"EMAIL\":{\n
-    \       \"TOOLTIP\":\"VMWare Tanzu Observability Email Id\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"email\":\"Email Id is invalid\",\n          \"required\":\"Email Id
-    cannot be empty\"\n        }\n      },\n      \"API_TOKEN\":{\n        \"TOOLTIP\":\"VMWare
-    Tanzu Observability Personal Access Token\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"HEADER\": \"VMWare Tanzu Observability\",\n      \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your VMWare Tanzu access</li><li><strong>Endpoint</strong>:
+    VMWare Tanzu host address, from which you access the VMWare Tanzu</li><li><strong>Email</strong>:
+    Provide the user's registered and authorized email</li><li><strong>API token</strong>:
+    The user's API token </li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your VMWare Tanzu access\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"END_POINT\":{\n
+    \       \"TOOLTIP\":\"VMWare Tanzu host address, from which you access the VMWare
+    Tanzu\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End Point cannot
+    be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n
+    \     \"EMAIL\":{\n        \"TOOLTIP\":\"Provide the user's registered and authorized
+    email\",\n        \"VALIDATION_MESSAGE\":{\n          \"email\":\"Email Id is invalid\",\n
+    \         \"required\":\"Email Id cannot be empty\"\n        }\n      },\n      \"API_TOKEN\":{\n
+    \       \"TOOLTIP\":\"The user's API token\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"Api Token cannot be empty\"\n        }\n      }\n    },\n
     \   \"MSTEAMS\":{\n      \"HEADER\": \"Microsoft Teams\",\n      \"BODY\":\"\"\n
-    \   },\n    \"SLACK\":{\n      \"HEADER\": \"Slack\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
+    \   },\n    \"SLACK\":{\n      \"HEADER\": \"Slack\",\n      \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your Slack access.</li><li><strong>BotName</strong>:
+    Provide the bot name where you want to receive notifications in slack</li><li><strong>Token</strong>:
+    The user's token to authenticate with slack.</li></span>\",\n      \"ACCOUNTNAME\":{\n
     \       \"TOOLTIP\":\"User defined name for the Slack account\",\n        \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
     other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
@@ -2550,74 +2747,97 @@ data:
     \         \"required\":\"Token cannot be empty\"\n        }\n      },\n      \"SPINNAKERTOGGLE\":{\n
     \       \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops
     enabled Spinnaker instance\",\n        \"VALIDATION_MESSAGE\":{}\n      }\n    },\n
-    \   \"OPA\":{\n      \"HEADER\": \"OPA\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
-    \       \"TOOLTIP\":\"User defined name for the OPA account\",\n        \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
-    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
-    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"ENDPOINT\":{\n
-    \       \"TOOLTIP\":\"OPA End Point\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
-    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     }\n    },\n    \"AQUAWAVE\":{\n      \"HEADER\": \"Aqua Wave\",\n      \"BODY\":\"\",\n
-    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User defined name for the Aqua Wave
-    account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
-    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    \   \"OPA\":{\n      \"HEADER\": \"OPA\",\n      \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your OPA server access.</li><li><strong>EndPoint</strong>:
+    OPA server host address, <span>such as https://opa:8181</span></li></span>\",\n
+    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined account name for your
+    OPA server access\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"USERNAME\":{\n        \"TOOLTIP\":\"Aqua Wave User Name\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"noSpecialCharacters\": \"User Name cannot contain special characters
-    other than - and _\",\n          \"cannotContainSpace\":\"User Name cannot contain
-    space\",\n          \"required\":\"User Name cannot be empty\",\n          \"startingFromNumber\":
-    \"User Name cannot start with numbers\"\n        }\n      },\n      \"TOKEN\":{\n
-    \       \"TOOLTIP\":\"Aqua Wave Personal Access Token\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Token cannot be empty\"\n        }\n      }\n    },\n    \"APPSCAN\":{\n
-    \     \"HEADER\": \"HCL AppScan\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
-    \       \"TOOLTIP\":\"User defined name for the HCL AppScan account\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"OPA server host address, such
+    as https://opa:8181\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
+    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    \     }\n    },\n    \"AQUAWAVE\":{\n      \"HEADER\": \"Aqua Wave\",\n      \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your Aqua Wave access.</li><li><strong>Username</strong>:
+    The Aquawave username</li><li><strong>Token</strong>: The user's token.</li></span>\",\n
+    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined account name for your
+    Aqua Wave access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \     },\n      \"USERNAME\":{\n        \"TOOLTIP\":\"The Aquawave username\",\n
+    \       \"VALIDATION_MESSAGE\":{\n          \"noSpecialCharacters\": \"User Name
+    cannot contain special characters other than - and _\",\n          \"cannotContainSpace\":\"User
+    Name cannot contain space\",\n          \"required\":\"User Name cannot be empty\",\n
+    \         \"startingFromNumber\": \"User Name cannot start with numbers\"\n        }\n
+    \     },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"Aqua Wave Personal Access Token\",\n
+    \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Bearer token cannot be
+    empty\"\n        }\n      }\n    },\n    \"APPSCAN\":{\n      \"HEADER\": \"HCL
+    AppScan\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your HCL AppScan access.</li><li><strong>Token</strong>: The user's
+    token</li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your HCL AppScan access.\",\n        \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
     other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
     \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"TOKEN\":{\n
-    \       \"TOOLTIP\":\"Appscan Personal Access Token\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Token cannot be empty\"\n        }\n      }\n    },\n    \"JFROG\":{\n
-    \     \"HEADER\": \"JFrog XRay Scanning\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
-    \       \"TOOLTIP\":\"User defined name for the JFrog XRay Scanning account\",\n
-    \       \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account Name
-    cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"JFrog URL\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Endpoint cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"JFrog
-    Personal Access Token\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token
-    cannot be empty\"\n        }\n      }\n    },\n    \"PRISMACLOUD\":{\n      \"HEADER\":
-    \"Prisma Cloud\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the Prisma Cloud account\",\n        \"VALIDATION_MESSAGE\":{\n
+    \       \"TOOLTIP\":\"The user's personal access token\",\n        \"VALIDATION_MESSAGE\":{\n
+    \         \"required\":\"Bearer token cannot be empty\"\n        }\n      }\n    },\n
+    \   \"JFROG\":{\n      \"HEADER\": \"JFrog XRay Scanning\",\n      \"BODY\":\"<span><li><strong>Account
+    Name</strong>: User-defined account name for your Jfrog Xray access.</li><li><strong>Endpoint</strong>:
+    Your Jfrog Xray host address, from which you access the Jfrog Xray instance</li><li><strong>Token</strong>:
+    The user's token.</li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your Jfrog Xray access.\",\n        \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n      },\n      \"ENDPOINT\":{\n
+    \       \"TOOLTIP\":\"Jfrog Xray host address, from which you access the Jfrog Xray
+    instance\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Endpoint
+    cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n
+    \     \"TOKEN\":{\n        \"TOOLTIP\":\"The user's token from jfrog xray to authenticate\",\n
+    \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot be empty\"\n
+    \       }\n      }\n    },\n    \"PRISMACLOUD\":{\n      \"HEADER\": \"Prisma Cloud\",\n
+    \     \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined account name
+    for your Prisma Cloud access.</li><li><strong>Host Url</strong>: Your Prisma Cloud
+    host address, from which you access the Prisma Cloud instance</li><li><strong>Access
+    Key ID</strong>: The user's access key who has access to the Prisma Cloud. If you
+    are unsure, consult your Prisma Cloud administrator to get an access key.</li><li><strong>Secret
+    key</strong>: The user's secret key</li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your Prisma Cloud access.\",\n        \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
     other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
     \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"HOSTURL\":{\n
-    \       \"TOOLTIP\":\"Prisma Cloud Host URL\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Host URL cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      },\n      \"APPLICATIONURL\":{\n        \"TOOLTIP\":\"Prisma
-    Cloud Application URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Application
+    \       \"TOOLTIP\":\"Prisma Cloud host address, from which you access the Prisma
+    Cloud instance\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Host
     URL cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     },\n      \"ACCESSKEYID\":{\n        \"TOOLTIP\":\"Prisma Cloud Access Key
-    Id\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Access Key Id
-    cannot be empty\"\n        }\n      },\n      \"SECRETKEY\":{\n        \"TOOLTIP\":\"Prisma
-    Cloud Secret Key\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Secret
+    \     },\n      \"APPLICATIONURL\":{\n        \"TOOLTIP\":\"Prisma Cloud Application
+    URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Application URL
+    cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n
+    \     \"ACCESSKEYID\":{\n        \"TOOLTIP\":\"The user's access key who has access
+    to the Prisma Cloud. If you are unsure, consult your Prisma Cloud administrator
+    to get an access key.\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Access
+    Key Id cannot be empty\"\n        }\n      },\n      \"SECRETKEY\":{\n        \"TOOLTIP\":\"The
+    user's secret key\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Secret
     Key cannot be empty\"\n        }\n      }\n    },\n    \"SONARQUBE\":{\n      \"HEADER\":
-    \"SonarQube\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the SonarQube account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"SonarQube\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Sonarqube access. </li><li><strong>Host Url</strong>: Sonarqube
+    host address, from which you access the Sonaqube instance</li><li><strong>Token</strong>:
+    The user's token (it is optional)</li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your Sonarqube access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
     \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \     },\n      \"HOSTURL\":{\n        \"TOOLTIP\":\"Sonarqube Host URL\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"required\":\"Host URL cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"Sonarqube
-    Personal Access Token\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token
-    cannot be empty\"\n        }\n      }\n    },\n    \"AUTOPILOT\":{\n      \"HEADER\":
-    \"Autopilot\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the Autopilot account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \     },\n      \"HOSTURL\":{\n        \"TOOLTIP\":\"Sonarqube host address, from
+    which you access the Sonaqube instance\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Host
+    URL cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    \     },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"The user's token (it is optional)\",\n
+    \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot be empty\"\n
+    \       }\n      }\n    },\n    \"AUTOPILOT\":{\n      \"HEADER\": \"Autopilot\",\n
+    \     \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User defined
+    name for the Autopilot account\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
     \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
@@ -2856,15 +3076,15 @@ data:
     \"Test Suite Key cannot contain space\"\n      }\n    }\n  }\n}\n"
 kind: ConfigMap
 metadata:
-  name: oea-ui-config
+  name: oes-ui-config
   labels:
-    app: oea
+    app: oes
     component: ui
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oea-ui/oea-ui-nginxconf.yaml
+# Source: isdargo/templates/oes-ui/oea-ui-nginxconf.yaml
 apiVersion: v1
 data:
   nginx-ap-only.conf: |
@@ -2915,11 +3135,11 @@ data:
             include /etc/nginx/default.d/*.conf;
   
             location ^~ /gate/ {
-              proxy_pass http://oea-gate:8084/ ;
+              proxy_pass http://oes-gate:8084/ ;
             }
   
             location ^~ /application {
-              proxy_pass http://oea-ui:8080 ;
+              proxy_pass http://oes-ui:8080 ;
             }
   
             location ^~ /ui {
@@ -2928,7 +3148,7 @@ data:
   
             # Go to Gate if you don't know what to do
             location / {
-              proxy_pass http://oea-gate:8084/ ;
+              proxy_pass http://oes-gate:8084/ ;
             }
   
   
@@ -2936,9 +3156,9 @@ data:
     }
 kind: ConfigMap
 metadata:
-  name: oea-ui-nginxconf
+  name: oes-ui-nginxconf
   labels:
-    app: oea
+    app: oes
     component: ui
     heritage: "Helm"
     release: "autopilot"
@@ -3150,12 +3370,12 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: carina
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-carina
+  name: oes-carina
 spec:
   ports:
   - name: carina
@@ -3163,12 +3383,12 @@ spec:
     protocol: TCP
     targetPort: 8091
   selector:
-    app: oea
+    app: oes
     component: carina
   sessionAffinity: None
   type: ClusterIP
 ---
-# Source: isdargo/templates/forwarder/oea-forwarder-svc-agent.yaml
+# Source: isdargo/templates/forwarder/oes-forwarder-svc-agent.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3194,7 +3414,7 @@ spec:
     port: 9004
     targetPort: remote-command
 ---
-# Source: isdargo/templates/forwarder/oea-forwarder-svc-agent.yaml
+# Source: isdargo/templates/forwarder/oes-forwarder-svc-agent.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3213,7 +3433,7 @@ spec:
   - name: agent-grpc
     port: 9001
 ---
-# Source: isdargo/templates/forwarder/oea-forwarder-svc-ipc.yaml
+# Source: isdargo/templates/forwarder/oes-forwarder-svc-ipc.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3233,17 +3453,17 @@ spec:
     port: 9001
     targetPort: agent-grpc
 ---
-# Source: isdargo/templates/oea-audit/oea-auditclient-service.yaml
+# Source: isdargo/templates/oes-audit/oes-auditclient-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: auditclient
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-audit-client
+  name: oes-audit-client
 spec:
   ports:
   - name: auditclient
@@ -3251,21 +3471,21 @@ spec:
     protocol: TCP
     targetPort: 8098
   selector:
-    app: oea
+    app: oes
     component: auditclient
   type: ClusterIP
 ---
-# Source: isdargo/templates/oea-audit/oea-auditservice-service.yaml
+# Source: isdargo/templates/oes-audit/oes-auditservice-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: auditservice
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-audit-service
+  name: oes-audit-service
 spec:
   ports:
   - name: auditservice
@@ -3273,21 +3493,21 @@ spec:
     protocol: TCP
     targetPort: 8097
   selector:
-    app: oea
+    app: oes
     component: auditservice
   type: ClusterIP
 ---
-# Source: isdargo/templates/oea-autopilot/oea-autopilot-service.yaml
+# Source: isdargo/templates/oes-autopilot/oes-autopilot-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: autopilot
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-autopilot
+  name: oes-autopilot
 spec:
   type: ClusterIP
   ports:
@@ -3298,20 +3518,20 @@ spec:
     port: 9090
     targetPort: 9090
   selector:
-    app: oea
+    app: oes
     component: autopilot
 ---
-# Source: isdargo/templates/oea-dashboard/oea-dashboard-service.yaml
+# Source: isdargo/templates/oes-dashboard/oea-dashboard-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: dashboard
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-dashboard
+  name: oes-dashboard
 spec:
   type: ClusterIP
   ports:
@@ -3320,20 +3540,20 @@ spec:
     port: 8094
     targetPort: 8094
   selector:
-    app: oea
+    app: oes
     component: dashboard
 ---
-# Source: isdargo/templates/oea-datascience/oea-datascience-service.yaml
+# Source: isdargo/templates/oes-datascience/oes-datascience-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: datascience
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-datascience
+  name: oes-datascience
 spec:
   ports:
   - name: datascience
@@ -3341,21 +3561,21 @@ spec:
     protocol: TCP
     targetPort: 5005
   selector:
-    app: oea
+    app: oes
     component: datascience
   type: ClusterIP
 ---
-# Source: isdargo/templates/oea-db/oea-db-service.yaml
+# Source: isdargo/templates/oes-db/oea-db-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: db
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-db
+  name: oes-db
 spec:
   type: ClusterIP
   ports:
@@ -3364,27 +3584,27 @@ spec:
     port: 5432
     targetPort: 5432
   selector:
-    app: oea
+    app: oes
     component: db
 ---
-# Source: isdargo/templates/oea-gate/oea-gate-service.yaml
+# Source: isdargo/templates/oes-gate/oes-gate-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: gate
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-gate
+  name: oes-gate
 spec:
   type: 
   ports:
   - name: "https"
     port: 443
     targetPort: 8084
-  - name: "oea-gate-service"
+  - name: "oes-gate-service"
     port: 8084
     protocol: TCP
     targetPort: 8084
@@ -3392,42 +3612,42 @@ spec:
     port: 80
     targetPort: 8084
   selector:
-    app: oea
+    app: oes
     component: gate
 ---
-# Source: isdargo/templates/oea-platform/oea-platform-service.yaml
+# Source: isdargo/templates/oes-platform/oes-platform-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: platform
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-platform
+  name: oes-platform
 spec:
   type: ClusterIP
   ports:
-  - name: oea-platform
+  - name: oes-platform
     protocol: TCP
     port: 8095
     targetPort: 8095
   selector:
-    app: oea
+    app: oes
     component: platform
 ---
-# Source: isdargo/templates/oea-sapor/oea-sapor-service.yaml
+# Source: isdargo/templates/oes-sapor/oea-sapor-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: sapor
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-sapor
+  name: oes-sapor
 spec:
   type: ClusterIP
   ports:
@@ -3435,20 +3655,20 @@ spec:
     port: 8085
     targetPort: 8085
   selector:
-    app: oea
+    app: oes
     component: sapor
 ---
-# Source: isdargo/templates/oea-ui/oea-ui-service.yaml
+# Source: isdargo/templates/oes-ui/oea-ui-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: ui
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-ui
+  name: oes-ui
 spec:
   type: 
   ports:
@@ -3459,20 +3679,20 @@ spec:
     port: 8080
     targetPort: 8080
   selector:
-    app: oea
+    app: oes
     component: ui
 ---
-# Source: isdargo/templates/oea-visibility/oea-visibility-service.yaml
+# Source: isdargo/templates/oes-visibility/oea-visibility-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: visibility 
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-visibility
+  name: oes-visibility
 spec:
   type: ClusterIP
   ports:
@@ -3481,15 +3701,33 @@ spec:
     port: 8096
     targetPort: 8096
   selector:
-    app: oea
+    app: oes
     component: visibility
 ---
-# Source: isdargo/templates/services/oes-rabbitmq-service.yaml
+# Source: isdargo/templates/opa/opa-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa
+  labels:
+    heritage: "Helm"
+    release: "autopilot"
+    chart: "isdargo-1.0.0"
+spec:
+  selector:
+    app: opa
+  ports:
+  - protocol: TCP
+    port: 8181
+    targetPort: 8181
+  type: ClusterIP
+---
+# Source: isdargo/templates/rabbitmq/oes-rabbitmq-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: oea
+    app: oes
     component: rabbitmq
     heritage: "Helm"
     release: "autopilot"
@@ -3506,26 +3744,8 @@ spec:
     protocol: TCP
     targetPort: 15672
   selector:
-    app: oea
+    app: oes
     component: rabbitmq
-  type: ClusterIP
----
-# Source: isdargo/templates/services/opa-service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: opa
-  labels:
-    heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
-spec:
-  selector:
-    app: opa
-  ports:
-  - protocol: TCP
-    port: 8181
-    targetPort: 8181
   type: ClusterIP
 ---
 # Source: isdargo/charts/minio/templates/deployment.yaml
@@ -3702,18 +3922,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: oea
+    app: oes
     component: carina
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-carina
+  name: oes-carina
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: carina
   strategy:
     rollingUpdate:
@@ -3723,18 +3943,18 @@ spec:
   template:
     metadata:
       labels:
-        app: oea
+        app: oes
         component: carina
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
       annotations:
-        checksum/secret: 163824c12800ea5b8b1af44e3aa0019085c60c7f426cbfafc32d3329fe018d23
+        checksum/secret: 98c2ead20b78215b2d74aaa8b025ca6ea04c85758ae12821c9d2036d2d6bb975
     spec:
       containers:
-      - image: opsmx11/carina-manager:v1.1.10
+      - image: opsmx11/carina-manager:v1.1.11
         imagePullPolicy: IfNotPresent
-        name: oea-carina
+        name: oes-carina
         ports:
         - containerPort: 8090
           protocol: TCP
@@ -3773,51 +3993,10 @@ spec:
           items:
           - key: carina-manager.yaml
             path: carina-manager.yaml
-          secretName: oea-carina-config
+          secretName: oes-carina-config
         name: carina-volume
 ---
-# Source: isdargo/templates/deployments/oes-rabbitmq-deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: oea
-    component: rabbitmq
-    heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
-  name: rabbitmq
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: oea
-      component: rabbitmq
-  template:
-    metadata:
-      annotations:
-      labels:
-        app: oea
-        component: rabbitmq
-        heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
-    spec:
-      containers:
-      - image: quay.io/opsmxpublic/rabbitmq:3-management
-        imagePullPolicy: IfNotPresent
-        name: rabbitmq
-        ports:
-        - containerPort: 5672
-          protocol: TCP
-        resources: {}
-      imagePullSecrets:
-      - name: opsmx11-secret
-      restartPolicy: Always
-      securityContext:
-        fsGroup: 1000
----
-# Source: isdargo/templates/forwarder/oea-forwarder-deployment.yaml
+# Source: isdargo/templates/forwarder/oes-forwarder-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -3848,7 +4027,7 @@ spec:
     spec:
       containers:
       - name: opsmx-controller-controller1
-        image: quay.io/opsmxpublic/forwarder-controller:v3.5.6
+        image: quay.io/opsmxpublic/forwarder-controller:v3.5.7
         ports:
           - containerPort: 9001
             name: agent-grpc
@@ -3896,22 +4075,22 @@ spec:
           - key: "configFile"
             path: "config.yaml"
 ---
-# Source: isdargo/templates/oea-audit/oea-audit-client.yaml
+# Source: isdargo/templates/oes-audit/oes-audit-client.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: oea
+    app: oes
     component: auditclient
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-audit-client
+  name: oes-audit-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: auditclient
   template:
     metadata:
@@ -3921,16 +4100,16 @@ spec:
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8098"
       labels:
-        app: oea
+        app: oes
         component: auditclient
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
     spec:
       containers:
-      - image: opsmx11/oes-audit-client:590f6de-1443 
+      - image: opsmx11/oes-audit-client:v4.1.0-rc1 
         imagePullPolicy: IfNotPresent
-        name: oea-audit-client
+        name: oes-audit-client
         ports:
         - containerPort: 8098
           name: backend
@@ -3969,7 +4148,7 @@ spec:
           items:
           - key: audit-local.yml
             path: audit-local.yml
-          secretName: oea-audit-client-config
+          secretName: oes-audit-client-config
         name: audit-config-volume
       - name: bootstrap-config-volume
         secret:
@@ -3983,23 +4162,23 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oea-audit/oea-audit-service.yaml
+# Source: isdargo/templates/oes-audit/oes-audit-service.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
   labels:
-    app: oea
+    app: oes
     component: auditservice
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-audit-service
+  name: oes-audit-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: auditservice
   template:
     metadata:
@@ -4009,16 +4188,16 @@ spec:
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8097"
       labels:
-        app: oea
+        app: oes
         component: auditservice
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
     spec:
       containers:
-      - image: opsmx11/oes-audit-service:v4.0.0-beta
+      - image: opsmx11/oes-audit-service:v4.1.0-rc1
         imagePullPolicy: IfNotPresent
-        name: oea-audit
+        name: oes-audit
         ports:
         - containerPort: 8097
           name: backend
@@ -4059,7 +4238,7 @@ spec:
           items:
           - key: audit-local.yml
             path: audit-local.yml
-          secretName: oea-audit-service-config
+          secretName: oes-audit-service-config
         name: audit-config-volume
       - name: bootstrap-config-volume
         secret:
@@ -4073,14 +4252,14 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oea-autopilot/oea-autopilot-deployment.yaml
+# Source: isdargo/templates/oes-autopilot/oes-autopilot-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-  name: oea-autopilot
+  name: oes-autopilot
   labels:
-    app: oea
+    app: oes
     component: autopilot
     heritage: "Helm"
     release: "autopilot"
@@ -4089,12 +4268,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: autopilot
   template:
     metadata:
       labels:
-        app: oea
+        app: oes
         component: autopilot
         heritage: "Helm"
         release: "autopilot"
@@ -4108,7 +4287,7 @@ spec:
       volumes:
         - name: autopilot-config-volume
           secret:
-            secretName: oea-autopilot-config
+            secretName: oes-autopilot-config
         - secret:
             items:
             - key: bootstrap.yml
@@ -4127,11 +4306,11 @@ spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
-        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oea-db to be up and running; pg_isready -h oea-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
+        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-        - image: opsmx11/oes-autopilot:bf9499670-783
+        - image: opsmx11/oes-autopilot:cf1fe39f2-1009
           imagePullPolicy: IfNotPresent
-          name: oea-autopilot
+          name: oes-autopilot
           resources:
             {}
           ports:
@@ -4163,42 +4342,42 @@ spec:
             initialDelaySeconds: 120
             periodSeconds: 60
 ---
-# Source: isdargo/templates/oea-dashboard/oea-dashboard-deployment.yaml
+# Source: isdargo/templates/oes-dashboard/oea-dashboard-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
   labels:
-    app: oea
+    app: oes
     component: dashboard
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-dashboard
+  name: oes-dashboard
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: dashboard
   strategy: {}
   template:
     metadata:
       annotations:
-        configmap/checksum: c04e848247f5864af6d80ea772006aba80310dfd78417374944502a222d2223d
+        configmap/checksum: bfdbbd95b11053a548502713f0ae6f99111cd8f853d814981ca6ecf1c31231be
         prometheus.io/scrape: "true"
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8094"
       labels:
-        app: oea
+        app: oes
         component: dashboard
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
     spec:
       containers:
-      - image: opsmx11/oes-dashboard:v4.0.0-beta
-        name: oea-dashboard
+      - image: opsmx11/oes-dashboard:v4.1.0-rc1
+        name: oes-dashboard
         ports:
         - containerPort: 8094
           protocol: TCP
@@ -4231,7 +4410,7 @@ spec:
       volumes:
       - name: dashboard-config
         configMap:
-          name: oea-dashboard-config
+          name: oes-dashboard-config
       - secret:
           items:
           - key: bootstrap.yml
@@ -4246,23 +4425,23 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oea-datascience/oea-datascience-deployment.yaml
+# Source: isdargo/templates/oes-datascience/oes-datascience-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
   labels:
-    app: oea
+    app: oes
     component: datascience
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-datascience
+  name: oes-datascience
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: datascience
   template:
     metadata:
@@ -4272,16 +4451,16 @@ spec:
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "5005"
       labels:
-        app: oea
+        app: oes
         component: datascience
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
     spec:
       containers:
-      - image: opsmx11/oes-datascience:v4.0.0-beta
+      - image: opsmx11/oes-datascience:v4.1.0-rc1
         imagePullPolicy: IfNotPresent
-        name: oea-datascience
+        name: oes-datascience
         ports:
         - containerPort: 5005
           name: backend
@@ -4305,44 +4484,44 @@ spec:
       - name: opsmx11-secret
       volumes:
       - secret:
-          secretName: oea-datascience-config
+          secretName: oes-datascience-config
         name: datascience-config-volume
 ---
-# Source: isdargo/templates/oea-gate/oea-gate-deployment.yaml
+# Source: isdargo/templates/oes-gate/oes-gate-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
   labels:
-    app: oea
+    app: oes
     component: gate
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-gate
+  name: oes-gate
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: gate
   template:
     metadata:
       annotations:
-        checksum/secret: f70de9a97aa13a7ae2b8ed83cc3ccc9db2cc87a35e82aef17d3abb7945feb3db
+        checksum/secret: 7e8ee2d093a462cded7af32c220ffda7f526ed551de7f7acf4d31ad0da07df84
         prometheus.io/scrape: "false"
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8084"
       labels:
-        app: oea
+        app: oes
         component: gate
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
     spec:
       containers:
-      - image: opsmx11/gate:711fee20-1679
-        name: oea-gate
+      - image: opsmx11/gate:v4.1.0-rc1
+        name: oes-gate
         env:
         - name: spring_profiles_active
           value: vault,local
@@ -4374,7 +4553,7 @@ spec:
       volumes:
       - name: gate-volume
         secret:
-          secretName: oea-gate-config
+          secretName: oes-gate-config
       - secret:
           items:
           - key: bootstrap.yml
@@ -4382,34 +4561,34 @@ spec:
           secretName: bootstrap
         name: bootstrap-volume
 ---
-# Source: isdargo/templates/oea-platform/oea-platform-deployment.yaml
+# Source: isdargo/templates/oes-platform/oes-platform-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
   labels:
-    app: oea
+    app: oes
     component: platform
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-platform
+  name: oes-platform
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: platform
   strategy: {}
   template:
     metadata:
       annotations:
-        checksum/secret: 2641d2d36043a844713a2b4ffa28ce8cc94b79f64ee7b657d6bf52235d7031f7
+        checksum/secret: 65123379f9cc434a9354a7791d60901ee3d0712d2924e89ddfada7e88e5b92f1
         prometheus.io/scrape: "true"
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8095"
       labels:
-        app: oea
+        app: oes
         component: platform
         heritage: "Helm"
         release: "autopilot"
@@ -4418,10 +4597,10 @@ spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
-        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oea-db to be up and running; pg_isready -h oea-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
+        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: opsmx11/oes-platform:f5807e61-1707
-        name: oea-platform
+      - image: opsmx11/oes-platform:v4.1.0-rc1
+        name: oes-platform
         ports:
         - containerPort: 8095
           protocol: TCP
@@ -4454,7 +4633,7 @@ spec:
       volumes:
       - name: platform-config-volume
         secret:
-          secretName: oea-platform-config
+          secretName: oes-platform-config
       - secret:
           items:
           - key: bootstrap.yml
@@ -4469,33 +4648,33 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oea-sapor/oea-sapor-deployment.yaml
+# Source: isdargo/templates/oes-sapor/oea-sapor-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: oea
+    app: oes
     component: sapor
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-sapor
+  name: oes-sapor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: sapor
   template:
     metadata:
       annotations:
-        checksum/configmap: 3e1e28ef28165b08c18a4caa819ff91f15534d0a5e06022778dcc0bcf8ecc53d
+        checksum/configmap: 7ec09466724e3a838b137945ce34d1da28e6083f37bfad9cf03fbc17e15b6825
         checksum/configmap: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         prometheus.io/scrape: "true"
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8085"
       labels:
-        app: oea
+        app: oes
         component: sapor
         heritage: "Helm"
         release: "autopilot"
@@ -4504,10 +4683,10 @@ spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
-        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oea-db to be up and running; pg_isready -h oea-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
+        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: opsmx11/sapor:007c96586b91bce78503aedcf3e42e2c93a1a1a6-904
-        name: oea-sapor
+      - image: opsmx11/oes-sapor:v4.1.0-rc1
+        name: oes-sapor
         env:
         ports:
         - containerPort: 8085
@@ -4556,7 +4735,7 @@ spec:
           secretName: ca-secret
         name: ca-certs-volume
       - secret:
-          secretName: oea-sapor-config
+          secretName: oes-sapor-config
         name: sapor-config-volume
       - secret:
           items:
@@ -4572,37 +4751,37 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oea-ui/oea-ui-deployment.yaml
+# Source: isdargo/templates/oes-ui/oea-ui-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: oea
+    app: oes
     component: ui
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-ui
+  name: oes-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: ui
   template:
     metadata:
       annotations:
         checksum/configmap: d884b8c12ed407b0e2ccff621c2ec92c193bdbaf13673ef473491437cae9a962
       labels:
-        app: oea
+        app: oes
         component: ui
         heritage: "Helm"
         release: "autopilot"
         chart: "isdargo-1.0.0"
     spec:
       containers:
-      - image: opsmx11/oes-ui:202209191005
-        name: oea-ui
+      - image: opsmx11/oes-ui:v4.1.0-rc1
+        name: oes-ui
         ports:
         - containerPort: 8080
           protocol: TCP
@@ -4632,40 +4811,40 @@ spec:
       volumes:
       - configMap:
           defaultMode: 420
-          name: oea-ui-config
+          name: oes-ui-config
         name: config-dir
       - configMap:
           defaultMode: 420
-          name: oea-ui-nginxconf
+          name: oes-ui-nginxconf
         name: nginx-config
 ---
-# Source: isdargo/templates/oea-visibility/oea-visibility-deployment.yaml
+# Source: isdargo/templates/oes-visibility/oea-visibility-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: oea
+    app: oes
     component: visibility
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-visibility
+  name: oes-visibility
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: visibility
   strategy: {}
   template:
     metadata:
       annotations:
-        configmap/checksum: c055f430e84f6009afdbff11c1bc335a3eb4ce8407015f204fbbeabb168c9277
+        configmap/checksum: 4da1b59521ab323f4e57e3ec71a44c101d209d1e4758aa09a9b54acf10e54050
         prometheus.io/scrape: "true"
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8096"
       labels:
-        app: oea
+        app: oes
         component: visibility
         heritage: "Helm"
         release: "autopilot"
@@ -4674,10 +4853,10 @@ spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
-        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oea-db to be up and running; pg_isready -h oea-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
+        command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: opsmx11/oes-visibility:v4.0.0-beta
-        name: oea-visibility
+      - image: opsmx11/oes-visibility:v4.1.0-rc1
+        name: oes-visibility
         ports:
         - containerPort: 8096
           protocol: TCP
@@ -4711,7 +4890,7 @@ spec:
       volumes:
       - name: visibility-config
         secret:
-          secretName: oea-visibility-config
+          secretName: oes-visibility-config
       - secret:
           items:
           - key: bootstrap.yml
@@ -4725,6 +4904,47 @@ spec:
             path: standard-error-codes.csv
           name: standard-error-codes-config
         name: standard-error-conf
+---
+# Source: isdargo/templates/rabbitmq/oes-rabbitmq-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: oes
+    component: rabbitmq
+    heritage: "Helm"
+    release: "autopilot"
+    chart: "isdargo-1.0.0"
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oes
+      component: rabbitmq
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: oes
+        component: rabbitmq
+        heritage: "Helm"
+        release: "autopilot"
+        chart: "isdargo-1.0.0"
+    spec:
+      containers:
+      - image: quay.io/opsmxpublic/rabbitmq:3-management
+        imagePullPolicy: IfNotPresent
+        name: rabbitmq
+        ports:
+        - containerPort: 5672
+          protocol: TCP
+        resources: {}
+      imagePullSecrets:
+      - name: opsmx11-secret
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 1000
 ---
 # Source: isdargo/charts/redis/templates/redis-master-statefulset.yaml
 apiVersion: apps/v1
@@ -4861,30 +5081,30 @@ spec:
   updateStrategy:
     type: RollingUpdate
 ---
-# Source: isdargo/templates/oea-db/oea-db-statefulset.yaml
+# Source: isdargo/templates/oes-db/oea-db-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: oea
+    app: oes
     component: db
     heritage: "Helm"
     release: "autopilot"
     chart: "isdargo-1.0.0"
-  name: oea-db
+  name: oes-db
 spec:
   podManagementPolicy: OrderedReady
   replicas: 1
-  serviceName: oea-db
+  serviceName: oes-db
   selector:
     matchLabels:
-      app: oea
+      app: oes
       component: db
   template:
     metadata:
       annotations:
       labels:
-        app: oea
+        app: oes
         component: db
         heritage: "Helm"
         release: "autopilot"
@@ -4895,7 +5115,7 @@ spec:
       containers:
       - image: opsmx11/ubi8-oes-db:v3.0.0
         imagePullPolicy: IfNotPresent
-        name: oea-db
+        name: oes-db
         lifecycle:
           preStop:
             exec:
@@ -4907,7 +5127,7 @@ spec:
           protocol: TCP
         volumeMounts:
         - mountPath: "/var/lib/pgsql-pv"
-          name: oea-db-postgresql
+          name: oes-db-postgresql
         readinessProbe:
           tcpSocket:
             port: 5432
@@ -4919,9 +5139,9 @@ spec:
   - metadata:
       creationTimestamp: null
       labels:
-        app: oea
+        app: oes
         component: db
-      name: oea-db-postgresql
+      name: oes-db-postgresql
     spec:
       accessModes:
       - ReadWriteOnce
