@@ -503,7 +503,7 @@ metadata:
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oes-sapor/oea-sapor-secret.yaml
+# Source: isdargo/templates/oes-sapor/oes-sapor-secret.yaml
 apiVersion: v1
 stringData:
   application.yml: |
@@ -611,7 +611,7 @@ metadata:
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oes-visibility/oea-visibility-secret.yaml
+# Source: isdargo/templates/oes-visibility/oes-visibility-secret.yaml
 apiVersion: v1
 stringData:
   visibility-local.yml: |
@@ -1253,7 +1253,7 @@ data:
           destination: opsmx-agent
           destinationService: agent-clouddriver
 ---
-# Source: isdargo/templates/oes-dashboard/oea-dashboard-configmap.yaml
+# Source: isdargo/templates/oes-dashboard/oes-dashboard-configmap.yaml
 apiVersion: v1
 data:
   dashboard-local.yml: |
@@ -1286,7 +1286,7 @@ metadata:
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oes-ui/oea-ui-configmap.yaml
+# Source: isdargo/templates/oes-ui/oes-ui-configmap.yaml
 apiVersion: v1
 data:
   app-config.json: |
@@ -3084,7 +3084,7 @@ metadata:
     release: "autopilot"
     chart: "isdargo-1.0.0"
 ---
-# Source: isdargo/templates/oes-ui/oea-ui-nginxconf.yaml
+# Source: isdargo/templates/oes-ui/oes-ui-nginxconf.yaml
 apiVersion: v1
 data:
   nginx-ap-only.conf: |
@@ -3521,7 +3521,7 @@ spec:
     app: oes
     component: autopilot
 ---
-# Source: isdargo/templates/oes-dashboard/oea-dashboard-service.yaml
+# Source: isdargo/templates/oes-dashboard/oes-dashboard-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3565,7 +3565,7 @@ spec:
     component: datascience
   type: ClusterIP
 ---
-# Source: isdargo/templates/oes-db/oea-db-service.yaml
+# Source: isdargo/templates/oes-db/oes-db-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3637,7 +3637,7 @@ spec:
     app: oes
     component: platform
 ---
-# Source: isdargo/templates/oes-sapor/oea-sapor-service.yaml
+# Source: isdargo/templates/oes-sapor/oes-sapor-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3658,7 +3658,7 @@ spec:
     app: oes
     component: sapor
 ---
-# Source: isdargo/templates/oes-ui/oea-ui-service.yaml
+# Source: isdargo/templates/oes-ui/oes-ui-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -3682,7 +3682,7 @@ spec:
     app: oes
     component: ui
 ---
-# Source: isdargo/templates/oes-visibility/oea-visibility-service.yaml
+# Source: isdargo/templates/oes-visibility/oes-visibility-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -4342,7 +4342,7 @@ spec:
             initialDelaySeconds: 120
             periodSeconds: 60
 ---
-# Source: isdargo/templates/oes-dashboard/oea-dashboard-deployment.yaml
+# Source: isdargo/templates/oes-dashboard/oes-dashboard-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -4648,7 +4648,7 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oes-sapor/oea-sapor-deployment.yaml
+# Source: isdargo/templates/oes-sapor/oes-sapor-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -4751,7 +4751,7 @@ spec:
           name: standard-error-codes-config
         name: standard-error-conf
 ---
-# Source: isdargo/templates/oes-ui/oea-ui-deployment.yaml
+# Source: isdargo/templates/oes-ui/oes-ui-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -4818,7 +4818,7 @@ spec:
           name: oes-ui-nginxconf
         name: nginx-config
 ---
-# Source: isdargo/templates/oes-visibility/oea-visibility-deployment.yaml
+# Source: isdargo/templates/oes-visibility/oes-visibility-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5081,7 +5081,7 @@ spec:
   updateStrategy:
     type: RollingUpdate
 ---
-# Source: isdargo/templates/oes-db/oea-db-statefulset.yaml
+# Source: isdargo/templates/oes-db/oes-db-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
