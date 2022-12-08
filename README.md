@@ -41,4 +41,7 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
      Login using browser with http://localhost:8080  
      
      - username **admin**
-     - password **opsmxadmin123**
+
+     Password can be retrieve the by using the below command
+     
+       kubectl get secret openldap -o jsonpath='{.data.LDAP_ADMIN_PASSWORD}'| base64 -d
