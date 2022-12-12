@@ -8,23 +8,23 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: autopilot-minio-update-prometheus-secret
+  name: isd-minio-update-prometheus-secret
   labels:
     app: minio-update-prometheus-secret
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 ---
 # Source: isdargo/charts/minio/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: "autopilot-minio"
+  name: "isd-minio"
   namespace: "opsmx-autopilot"
   labels:
     app: minio
     chart: minio-8.0.9
-    release: "autopilot"
+    release: "isd"
 ---
 # Source: isdargo/templates/forwarder/create-controller-secret.yaml
 apiVersion: v1
@@ -36,11 +36,11 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: autopilot-minio
+  name: isd-minio
   labels:
     app: minio
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 type: Opaque
 data:
@@ -55,7 +55,7 @@ metadata:
   labels:
     app: openldap
     chart: openldap-1.2.3
-    release: autopilot
+    release: isd
     heritage: Helm
 type: Opaque
 data:
@@ -66,11 +66,11 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: autopilot-redis
+  name: isd-redis
   labels:
     app: redis
     chart: redis-10.5.3
-    release: "autopilot"
+    release: "isd"
     heritage: "Helm"
 type: Opaque
 data:
@@ -101,8 +101,8 @@ metadata:
     app: oes
     component: carina
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-carina-config
 ---
 # Source: isdargo/templates/oes-audit/oes-audit-client-secret.yaml
@@ -146,8 +146,8 @@ metadata:
     app: oes
     component: auditclient
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-audit-client-config
 ---
 # Source: isdargo/templates/oes-audit/oes-audit-service-secret.yaml
@@ -195,8 +195,8 @@ metadata:
     app: oes
     component: auditservice
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-audit-service-config
 ---
 # Source: isdargo/templates/oes-autopilot/oes-autopilot-secret.yaml
@@ -213,10 +213,8 @@ stringData:
     secret.ds.protocol=http://
     secret.ds.url=localhost:5005
     secret.dashboard.url=http://oes-dashboard:8094
-    
-    server.host.dns.name=http://sai.isd.ninja-test.opsmx.net/ui
-    
-    gate.url=http://sai.isd.ninja-test.opsmx.net/gate
+    server.host.dns.name=http://localhost:8080/ui
+    gate.url=http://oes-gate:8084
     
     #datascience configuration
     oes.datascience.baseUrl=http://oes-datascience:5005
@@ -237,7 +235,7 @@ stringData:
     #storage configuration
     storage.type =db_storage
     #storage.type =object_storage
-    #storage.endpoint=http://autopilot-minio:9000
+    #storage.endpoint=http://isd-minio:9000
     #storage.accesskey = spinnakeradmin
     #storage.secretkey = spinnakeradmin
     #storage.region= us-east-1
@@ -255,8 +253,8 @@ metadata:
     app: oes
     component: autopilot
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/oes-datascience/oes-datascience-secret.yaml
 apiVersion: v1
@@ -275,7 +273,7 @@ stringData:
        # Only accept True or False
     
     OBJECT_STORAGE:
-          ENDPOINT: http://autopilot-minio:9000
+          ENDPOINT: http://isd-minio:9000
           BUCKET_NAME: autopilot
     POSTGRES:
           USERNAME: 'postgres'
@@ -340,7 +338,7 @@ stringData:
         externalUrl: /ui/
       user: {}
     cors:
-      allowed-origins-pattern: ^https?://(?:localhost|sai.isd.ninja-test.opsmx.net|opsmx.com)(?::[1-9]\d*)?/?
+      allowed-origins-pattern: ^https?://(?:localhost|oes.example.ops.com|opsmx.com)(?::[1-9]\d*)?/?
     ldap:
       enabled: true
       url: ldap://openldap:389
@@ -358,7 +356,7 @@ stringData:
       mode: session
     google: {}
     redis:
-      connection: redis://:password@autopilot-redis-master:6379
+      connection: redis://:password@isd-redis-master:6379
     server:
       session:
         timeoutInSeconds: 7200
@@ -398,8 +396,8 @@ metadata:
     app: oes
     component: gate
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/oes-gate/oes-gate-secret.yaml
 apiVersion: v1
@@ -423,7 +421,7 @@ stringData:
         password: 'networks123'
     ldap.managerPassword: 'opsmxadmin123'
     redis:
-        connection: redis://:password@autopilot-redis-master:6379
+        connection: redis://:password@isd-redis-master:6379
     #datasource.url: jdbc:postgresql://oes-db:5432/visibilitydb
     #postgres.password: 'networks123'
     #postgres.username: 'postgres'
@@ -469,18 +467,18 @@ stringData:
       auditclient:
         url: http://oes-audit-client:8098
       policyGate:
-        url: "http://sai.isd.ninja-test.opsmx.net/gate"
+        url: "https://oes.example.ops.com/gate"
         path: /v1/data/
       ui:
       # Ex: "https://oes-poc.dev.opsmx.org/"
-        url: "http://sai.isd.ninja-test.opsmx.net/ui"
+        url: "https://oes.example.ops.com/ui"
       gate:
         url: http://oes-gate:8084
       approvalGate:
-        apiUrl: http://sai.isd.ninja-test.opsmx.net/gate/visibilityservice/v5/approvalGates/{id}/trigger
+        apiUrl: https://oes.example.ops.com/gate/visibilityservice/v5/approvalGates/{id}/trigger
     
       verificationGate:
-        apiUrl: http://sai.isd.ninja-test.opsmx.net/gate/autopilot/api/v3/registerCanary
+        apiUrl: https://oes.example.ops.com/gate/autopilot/api/v3/registerCanary
     
     logging:
       level:
@@ -500,8 +498,8 @@ metadata:
     app: oes
     component: platform
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/oes-sapor/oes-sapor-secret.yaml
 apiVersion: v1
@@ -540,10 +538,10 @@ stringData:
         url: http://oes-visibility:8096
       auditservice:
         enabled: true
-        url: "http://oes-audit-service:8097" 
+        url: "http://oes-audit-service:8097"
       dashboard:
         url: http://oes-dashboard:8094
-      commongateurl: http://sai.isd.ninja-test.opsmx.net/gate
+      commongateurl: https://oes.example.ops.com/gate
     spinnaker:
       encrypt:
         enabled: false
@@ -556,29 +554,29 @@ stringData:
     
     pipeline-promotion:
       github:
-        
+    
         enabled: true
-        
+    
         username:  git/stash_username
         token: git/stash_token
         branch: master
         cloneUrl: https://git/stash_username:git/stash_token@github.com/OpsMx/standard-gitops-repo
       bitbucket:
-        
+    
         enabled: false
-        
+    
         username:  git/stash_username
         token: git/stash_token
         branch: master
         cloneUrl: https://git/stash_username:git/stash_token@github.com/OpsMx//standard-gitops-repo
       amazonS3:
-        
+    
         enabled: false
-        
+    
         accessKeyId: AWS_ACCESS_KEY_ID
         secretAccessKey: AWS_SECRET_ACCESS_KEY
         region: regionofbucket
-        bucketName: bucket name.e.g-testbucket 
+        bucketName: bucket name.e.g-testbucket
     
     ## Set the below field to true if agent for kubernetes
     kubernetes:
@@ -597,7 +595,7 @@ stringData:
         path: /opt/opsmx/controller
         kubectlTemplateFileName: kubeconfig.template
         manifestTemplateFileName: deploy-agent.template
-      
+    
     
   client.p12: |
     
@@ -608,8 +606,8 @@ metadata:
     app: oes
     component: sapor
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/oes-visibility/oes-visibility-secret.yaml
 apiVersion: v1
@@ -625,10 +623,10 @@ stringData:
         connectors:
           configured: JIRA,GIT,AUTOPILOT,SONARQUBE,JENKINS,AQUAWAVE
       logging:
-        level:  
-          io:     
+        level:
+          io:
             swagger:
-              models: 
+              models:
                 parameters:
                   AbstractSerializableParameter: ERROR
     
@@ -658,7 +656,7 @@ stringData:
     
     ui:
       approval:
-        url: http://sai.isd.ninja-test.opsmx.net/ui/application/visibility/{applicationId}/{serviceId}/{approvalGateId}  
+        url: https://oes.example.ops.com/ui/application/visibility/{applicationId}/{serviceId}/{approvalGateId}
     
     gate:
       url: http://oes-gate:8084
@@ -713,8 +711,8 @@ metadata:
     app: oes
     component: visibility
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/secrets/bootstrap-secret.yaml
 apiVersion: v1
@@ -743,8 +741,8 @@ metadata:
   name: bootstrap
   labels:
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/secrets/sapor-bootstrap-secret.yaml
 apiVersion: v1
@@ -775,8 +773,8 @@ metadata:
   name: sapor-bootstrap
   labels:
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/secrets/secret.yaml
 apiVersion: v1
@@ -793,11 +791,11 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: autopilot-minio
+  name: isd-minio
   labels:
     app: minio
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 data:
   initialize: |-
@@ -911,7 +909,7 @@ metadata:
   labels:
     app: openldap
     chart: openldap-1.2.3
-    release: autopilot
+    release: isd
     heritage: Helm
 data:
   01-memberof.ldif: |-
@@ -1028,7 +1026,7 @@ metadata:
   labels:
     app: openldap
     chart: openldap-1.2.3
-    release: autopilot
+    release: isd
     heritage: Helm
 data:
   LDAP_BACKEND: hdb
@@ -1042,12 +1040,12 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: autopilot-redis
+  name: isd-redis
   labels:
     app: redis
     chart: redis-10.5.3
     heritage: Helm
-    release: autopilot
+    release: isd
 data:
   redis.conf: |-
     # User-supplied configuration:
@@ -1069,12 +1067,12 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: autopilot-redis-health
+  name: isd-redis-health
   labels:
     app: redis
     chart: redis-10.5.3
     heritage: Helm
-    release: autopilot
+    release: isd
 data:
   ping_readiness_local.sh: |-
     response=$(
@@ -1221,13 +1219,13 @@ metadata:
     agent.opsmx.com/name: controller1
     agent.opsmx.com/role: controller
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 data:
   configFile: |
     serviceHostname: opsmx-controller-controller1
-    agentHostname: controller.exampleopsmx.net
-    remoteCommandHostname: controller.exampleopsmx.net
+    agentHostname: agent-grpc
+    remoteCommandHostname: agent-grpc
     controlHostname: opsmx-controller-controller1
     #agentAdvertisePort: "443"
     serviceAuth:
@@ -1283,8 +1281,8 @@ metadata:
     app: oes
     component: dashboard
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/oes-ui/oes-ui-configmap.yaml
 apiVersion: v1
@@ -1450,15 +1448,16 @@ data:
     \"File cannot be empty\"\n      }\n    },\n    \"AWS_ACCOUNT_NAME\": {\n      \"TOOLTIP\":
     \"\",\n      \"VALIDATION_MESSAGE\": {\n        \"required\": \"Please Select AWS
     Account\"\n      }\n    }\n  },\n  \"SPINNAKER_LISTING\": {\n    \"HEADER\": \"No
-    Spinnaker Configured!\",\n    \"BODY\": \"<div><p>CD Integration page allows you
-    to connect to a CD instance. This enables ML based verification, Policy enforcement,
-    Informed Approvals, etc.</p><p>Click on the <b>New CD Integration</b> button to
-    connect to a CD instance. Only one instance is supported.</p></div>\"\n  },\n  \"SPINNAKER_SETUP\":
-    {\n    \"HEADER\": \"Spinnaker\",\n    \"BODY\": \"<p>In this page you can add /
-    update information about your CD instance.</p> <p><strong>Fields:</strong></p> <ul
-    class='helpTextUI'> <li><strong>CD Name</strong>: User defined name for CD instance.<br><span>
-    Example: opsmx-spinnaker</span></li> <li><strong>CD URL</strong>: Gate URL of the
-    CD instance.<br> <span>Example: https://spinnaker-gate.xyz.com or http://oes-gate:8084</span></li>
+    CD Integration found!\",\n     \"BODY\": \"<div><p>CD Integration Page allows you
+    to connect to multiple Argo CD instances.  This enables delivery insights, deployments
+    audit and automated analysis across multiple Argo cd instances.</p><p>Click on the
+    <b>New CD Integration</b> button to get started.</p></div>\",\n     \"CDTOOL_ERROR\":
+    \"Unable to connect to CD Tool\"\n  },\n  \"SPINNAKER_SETUP\": {\n    \"HEADER\":
+    \"Spinnaker\",\n    \"BODY\": \"<p>In this page you can add / update information
+    about your CD instance.</p> <p><strong>Fields:</strong></p> <ul class='helpTextUI'>
+    <li><strong>CD Name</strong>: User defined name for CD instance.<br><span> Example:
+    opsmx-spinnaker</span></li> <li><strong>CD URL</strong>: Gate URL of the CD instance.<br>
+    <span>Example: https://spinnaker-gate.xyz.com or http://oes-gate:8084</span></li>
     <li><strong>Authentication Type:</strong>: Can be LDAP or X509; for AD, use LDAP</li>
     <li><strong>Token: </strong> This is used when Authentication Type is LDAP; username
     & password to LDAP server separated by <b>:</b> in base64 format; Output of 'echo
@@ -1880,7 +1879,7 @@ data:
     \"\"\n    },\n    \"POLICY\": {\n      \"TOOLTIP\": \"\",\n      \"VALIDATION_MESSAGE\":
     \"\"\n    },\n    \"DELETE_PERMISSION\": {\n      \"TOOLTIP\": \"Insufficient Permission
     to Delete this Gate\",\n      \"VALIDATION_MESSAGE\": \"\"\n    }\n  },\n  \"LOGGED_INUSER_DETAILS\":
-    {\n    \"HEADER\": \"No Users found\",\n    \"BODY\": \"\"\n  },\n    \n  \"APPLICATION_DEPLOYMENT\":
+    {\n    \"HEADER\": \"No Users found\",\n    \"BODY\": \"\"\n  },\n\n  \"APPLICATION_DEPLOYMENT\":
     {\n    \"DEPLOYMENT_GRID_SYNC\": {\n      \"TOOLTIP\": \"When the cluster deployment
     matches with the latest pipeline execution it is 'In Sync'; if not, it is 'Out of
     Sync'\"\n    }\n  },\n\"INTEGRATION\": {\n\"AMAZONS3\":{\n  \"HEADER\": \"Amazon
@@ -1945,24 +1944,24 @@ data:
     Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \ },\n  \"ENDPOINT\":{ \n    \"TOOLTIP\":\"The base URL of your Artifactory search
+    \ },\n  \"ENDPOINT\":{\n    \"TOOLTIP\":\"The base URL of your Artifactory search
     is reachable at\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Endpoint
-    cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"REPO\":{
-    \n    \"TOOLTIP\":\"The repo in your artifactory to be searched\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Repo cannot be empty\"\n    }\n  },\n  \"REPOTYPE\":{ \n    \"TOOLTIP\":\"The
-    package type of repo in your Artifactory is to be searched. Default is Maven.\",\n
-    \   \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"GROUPID\":{ \n    \"TOOLTIP\":\"The
-    group id in your Artifactory is to be searched.\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external
-    resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Authentication
-    cannot be empty\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The Token of the
-    artifactory user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
-    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The Artifactory
-    user's username for authentication\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Username
-    cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"The Artifactory
-    user's password for authentication\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
-    cannot be empty\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle
-    on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
+    cannot be empty\",\n      \"invalidUrl\": \"Endpoint URL is invalid\"\n    }\n  },\n
+    \ \"REPO\":{\n    \"TOOLTIP\":\"The repo in your artifactory to be searched\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Repo cannot be empty\"\n    }\n
+    \ },\n  \"REPOTYPE\":{\n    \"TOOLTIP\":\"The package type of repo in your Artifactory
+    is to be searched. Default is Maven.\",\n    \"VALIDATION_MESSAGE\":{\n    }\n  },\n
+    \ \"GROUPID\":{\n    \"TOOLTIP\":\"The group id in your Artifactory is to be searched.\",\n
+    \   \"VALIDATION_MESSAGE\":{\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select
+    how the external resource confirms the user credentials\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Authentication cannot be empty\"\n    }\n  },\n  \"TOKEN\":{\n
+    \   \"TOOLTIP\":\"The Token of the artifactory user to authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The
+    Artifactory user's username for authentication\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Username cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n
+    \   \"TOOLTIP\":\"The Artifactory user's password for authentication\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Password cannot be empty\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
+    \   \"TOOLTIP\":\"Toggle on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
     \ }\n},\n\"BITBUCKET\":{\n  \"HEADER\": \"Bitbucket Cloud\",\n  \"BODY\":\"<span><p>BitBucket
     Cloud integration can be used as a datasource for Approval Gate as well as to configure
     Spinnaker for BitBucket Cloud.</p><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
@@ -1988,10 +1987,10 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"BitBucket Cloud (SaaS) Web URL. It is usually
     https://bitbucket.org\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host
-    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    URL cannot be empty\",\n      \"invalidUrl\": \"Host URL is invalid\"\n    }\n  },\n
     \ \"APIURL\":{\n    \"TOOLTIP\":\"Bitbucket API base URL. Eg. https://api.github.com\",\n
     \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"API URL cannot be empty\",\n
-    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
+    \     \"invalidUrl\": \"API URL is invalid\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
     \   \"TOOLTIP\":\"Select one of the available options. If you are unsure, consult
     your BitBucket administrator to determine which authentication mechanism is used.\",\n
     \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The user's
@@ -2031,7 +2030,7 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"BitBucket Cloud (SaaS) Web URL. It is usually
     https://bitbucket.org\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host
-    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    URL cannot be empty\",\n      \"invalidUrl\": \"Host URL is invalid\"\n    }\n  },\n
     \ \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select one of the available options.
     If you are unsure, consult your BitBucket administrator to determine which authentication
     mechanism is used.\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The
@@ -2084,7 +2083,7 @@ data:
     authenticate as\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password
     cannot be empty\"\n    }\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Docker Registry
     Host URL\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL cannot
-    be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
+    be empty\",\n      \"invalidUrl\": \"Host URL is invalid\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
     \   \"TOOLTIP\":\"Toggle on to propagate the change into the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n
     \ }\n},\n\"OCR\":{\n  \"HEADER\": \"Generic Docker Registries (ACR, Quay, JFrog)\",\n
     \ \"BODY\":\"<span><p><strong>Fields</strong>:</p><ul class='helpTextUl'><li><strong>Account
@@ -2131,7 +2130,7 @@ data:
     \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Toggle on to propagate the change into
     the CD Tool.\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Container
     Registry Host URL\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL
-    cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  }\n},\n\"GITHUB\":{\n
+    cannot be empty\",\n      \"invalidUrl\": \"Host URL is invalid\"\n    }\n  }\n},\n\"GITHUB\":{\n
     \ \"HEADER\": \"GitHub\",\n  \"BODY\":\"<span><p>GITHUB integration can be used
     as a datasource for Approval Gate as well as to configure Spinnaker for GitHub.</p><p><strong>Fields</strong>:</p><ul
     class='helpTextUl'><li><strong>Account Name</strong>: User-defined account name
@@ -2151,22 +2150,23 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \ },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"Github's host address, such as https://github.com\",\n
     \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host URL cannot be empty\",\n
-    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"Github's
+    \     \"invalidUrl\": \"Host URL is invalid\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"Github's
     API endpoint host address, such as https://api.github.com\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"API URL cannot be empty\",\n      \"invalidUrl\": \"URL is
-    invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The user's token\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The
-    GitHub username\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
-    Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
-    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to configure the
-    resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ }\n},\n\"GITLAB\":{\n  \"HEADER\": \"GitLab\",\n  \"BODY\":\"<span><li><strong>Account
-    Name</strong>: User-defined account name for your GitLab access.</li><li><strong>Host
-    URL</strong>: GitLab's host address, such as https://gitlab.com</li><li><strong>Username</strong>:
-    The GitLab server username </li><li><strong>Token</strong>: The user's personal
-    access token. Please refer <a href='https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html'
+    \     \"required\":\"API URL cannot be empty\",\n      \"invalidUrl\": \"API URL
+    is invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"The user's token\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n    }\n
+    \ },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"The GitHub username\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"User Name cannot contain special characters other
+    than - and _\",\n      \"cannotContainSpace\":\"User Name cannot contain space\",\n
+    \     \"required\":\"User Name cannot be empty\",\n      \"startingFromNumber\":
+    \"User Name cannot start with numbers\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
+    \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
+    Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"GITLAB\":{\n  \"HEADER\":
+    \"GitLab\",\n  \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your GitLab access.</li><li><strong>Host URL</strong>: GitLab's
+    host address, such as https://gitlab.com</li><li><strong>Username</strong>: The
+    GitLab server username </li><li><strong>Token</strong>: The user's personal access
+    token. Please refer <a href='https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html'
     target='_blank'>this document</a> for generating tokens.</li></span>\",\n  \"ACCOUNTNAME\":{\n
     \   \"TOOLTIP\":\"User-defined account name for your GitLab access.\",\n    \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
@@ -2174,9 +2174,9 @@ data:
     \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
     \"Account Name cannot start with numbers\"\n    }\n  },\n  \"HOSTURL\":{\n    \"TOOLTIP\":\"GitLab's
     host address, such as https://gitlab.com\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Host
-    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    URL cannot be empty\",\n      \"invalidUrl\": \"Host URL is invalid\"\n    }\n  },\n
     \ \"APIBASEURL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
-    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
+    URL cannot be empty\",\n      \"invalidUrl\": \"API URL is invalid\"\n    }\n  },\n
     \ \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select how the external resource confirms
     the user credentials\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"GitLab
     token\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n
@@ -2192,25 +2192,25 @@ data:
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \ },\n  \"DEPLOYMENT\":{\n    \"TOOLTIP\":\"This Halyard deployment will be used
-    for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"URL
-    cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n
-    \   \"TOOLTIP\":\"Select an authentication type that corresponds to the connection
-    credential parameter. Recommended using the user token method.\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ },\n  \"URL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"API
-    URL cannot be empty\",\n      \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n
-    \ \"TOKEN\":{\n    \"TOOLTIP\":\"Git token\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
-    cannot be empty\"\n    }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"Git password\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Password cannot be empty\"\n
-    \   }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"Git username\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"noSpecialCharacters\": \"User Name cannot contain special characters other
-    than - and _\",\n      \"cannotContainSpace\":\"User Name cannot contain space\",\n
-    \     \"required\":\"User Name cannot be empty\",\n      \"startingFromNumber\":
-    \"User Name cannot start with numbers\"\n    }\n  },\n  \"SPINNAKERTOGGLE\":{\n
-    \   \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops enabled
-    Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n  }\n},\n\"HELM\":{\n  \"HEADER\":
-    \"Helm\",\n  \"BODY\": \"<span><li><strong>Account Name</strong>: User-defined account
-    name for target Helm repository access.</li><li><strong>Repository</strong>: Helm
-    Chart Repository’s HTTP endpoint.</li><li><strong>Authentication Type</strong>:
+    for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Deployment
+    URL cannot be empty\",\n      \"invalidUrl\": \"Deployment URL is invalid\"\n    }\n
+    \ },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication type
+    that corresponds to the connection credential parameter. Recommended using the user
+    token method.\",\n    \"VALIDATION_MESSAGE\":{}\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"\",\n
+    \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"API URL cannot be empty\",\n
+    \     \"invalidUrl\": \"API URL is invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"Git
+    token\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token cannot be empty\"\n
+    \   }\n  },\n  \"PASSWORD\":{\n    \"TOOLTIP\":\"Git password\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Password cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n
+    \   \"TOOLTIP\":\"Git username\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"User Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
+    \ \"SPINNAKERTOGGLE\":{\n    \"TOOLTIP\":\"Switch On this toggle to configure the
+    resource in a gitops enabled Spinnaker instance\",\n    \"VALIDATION_MESSAGE\":{}\n
+    \ }\n},\n\"HELM\":{\n  \"HEADER\": \"Helm\",\n  \"BODY\": \"<span><li><strong>Account
+    Name</strong>: User-defined account name for target Helm repository access.</li><li><strong>Repository</strong>:
+    Helm Chart Repository’s HTTP endpoint.</li><li><strong>Authentication Type</strong>:
     Select an authentication type that corresponds to the connection credential parameter.</li><li><strong>Connect
     to Spinnaker</strong>: Toggle ON to propagate the change to Spinnaker Toggle on
     to propagate the change into the CD Tool.</li></span>\",\n  \"ACCOUNTNAME\":{\n
@@ -2221,14 +2221,14 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \ },\n  \"REPOSITORY\":{\n    \"TOOLTIP\":\"Helm Chart Repository’s HTTP endpoint\",\n
     \   \"VALIDATION_MESSAGE\":{\n      \"required\":\"Repository cannot be empty\",\n
-    \     \"invalidUrl\": \"URL is invalid\"\n    }\n  },\n  \"DEPLOYMENT\":{\n    \"TOOLTIP\":\"This
-    Halyard deployment will be used for Account creation / update\",\n    \"VALIDATION_MESSAGE\":{\n
-    \   \n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select an authentication
-    type that corresponds to the connection credential parameter.\",\n    \"VALIDATION_MESSAGE\":{}\n
-    \ },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n      \"required\":\"Token
-    cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"User Name\",\n
-    \   \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User Name cannot
-    contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
+    \     \"invalidUrl\": \"Repository URL is invalid\"\n    }\n  },\n  \"DEPLOYMENT\":{\n
+    \   \"TOOLTIP\":\"This Halyard deployment will be used for Account creation / update\",\n
+    \   \"VALIDATION_MESSAGE\":{\n\n    }\n  },\n  \"AUTHENTICATIONTYPE\":{\n    \"TOOLTIP\":\"Select
+    an authentication type that corresponds to the connection credential parameter.\",\n
+    \   \"VALIDATION_MESSAGE\":{}\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"User
+    Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User Name
+    cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
     Name cannot contain space\",\n      \"required\":\"User Name cannot be empty\",\n
     \     \"startingFromNumber\": \"User Name cannot start with numbers\"\n    }\n  },\n
     \ \"PASSWORD\": {\n    \"TOOLTIP\": \"Password\",\n    \"VALIDATION_MESSAGE\":{\n
@@ -2411,8 +2411,8 @@ data:
     the default value of fake.email@spinnaker.io will be used.\",\n    \"VALIDATION_MESSAGE\":{\n
     \     \"email\":\"Email Id is invalid\",\n      \"required\":\"Email Id cannot be
     empty\"\n    }\n  },\n  \"URL\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
-    \     \"required\":\"API URL cannot be empty\",\n      \"invalidUrl\": \"URL is
-    invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
+    \     \"required\":\"API URL cannot be empty\",\n      \"invalidUrl\": \"API URL
+    is invalid\"\n    }\n  },\n  \"TOKEN\":{\n    \"TOOLTIP\":\"\",\n    \"VALIDATION_MESSAGE\":{\n
     \     \"required\":\"Token cannot be empty\"\n    }\n  },\n  \"USERNAME\":{\n    \"TOOLTIP\":\"GCR
     User Name\",\n    \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"User
     Name cannot contain special characters other than - and _\",\n      \"cannotContainSpace\":\"User
@@ -2443,12 +2443,13 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \   },\n    \"ENDPOINT\":{\n      \"TOOLTIP\":\"Bamboo URL\",\n      \"VALIDATION_MESSAGE\":{\n
     \       \"required\":\"Bamboo End Point cannot be empty\",\n        \"invalidUrl\":
-    \"URL is invalid\"\n      }\n    },\n    \"AUTHENTICATIONTYPE\":{\n      \"TOOLTIP\":\"Select
-    how the external resource confirms the user credentials\",\n      \"VALIDATION_MESSAGE\":{}\n
-    \   },\n    \"TOKEN\":{\n      \"TOOLTIP\":\"Your Bamboo token\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Token cannot be empty\"\n      }\n    },\n    \"USERNAME\":{\n
-    \     \"TOOLTIP\":\"Your Bamboo username\",\n      \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\":
-    \"User Name cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"User
+    \"Bamboo End Point URL is invalid\"\n      }\n    },\n    \"AUTHENTICATIONTYPE\":{\n
+    \     \"TOOLTIP\":\"Select how the external resource confirms the user credentials\",\n
+    \     \"VALIDATION_MESSAGE\":{}\n    },\n    \"TOKEN\":{\n      \"TOOLTIP\":\"Your
+    Bamboo token\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Token cannot
+    be empty\"\n      }\n    },\n    \"USERNAME\":{\n      \"TOOLTIP\":\"Your Bamboo
+    username\",\n      \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\": \"User
+    Name cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"User
     Name cannot contain space\",\n        \"required\":\"User Name cannot be empty\",\n
     \       \"startingFromNumber\": \"User Name cannot start with numbers\"\n      }\n
     \   },\n    \"PASSWORD\":{\n      \"TOOLTIP\":\"Your Bamboo password\",\n      \"VALIDATION_MESSAGE\":{\n
@@ -2474,7 +2475,7 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \   },\n    \"HOSTURL\":{\n      \"TOOLTIP\":\"Jenkins host address, such as https://jenkins.opsmx.net\",\n
     \     \"VALIDATION_MESSAGE\":{\n        \"required\":\"Host URL cannot be empty\",\n
-    \       \"invalidUrl\": \"URL is invalid\"\n      }\n    },\n    \"CSRFFLAG\":{\n
+    \       \"invalidUrl\": \"Host URL is invalid\"\n      }\n    },\n    \"CSRFFLAG\":{\n
     \     \"TOOLTIP\":\"Recommended to toggle on the CSRF (Cross-Site Request Forgery)
     flag.\"\n    },\n    \"AUTHENTICATIONTYPE\":{\n      \"TOOLTIP\":\"Select an authentication
     type that corresponds to the connection credential parameter. It is preferable to
@@ -2500,9 +2501,9 @@ data:
     Access Token\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Token cannot
     be empty\"\n      }\n    },\n    \"HOSTURL\":{\n      \"TOOLTIP\":\"Jira Host URL\",\n
     \     \"VALIDATION_MESSAGE\":{\n        \"required\":\"Host URL cannot be empty\",\n
-    \       \"invalidUrl\": \"URL is invalid\"\n      }\n    },\n    \"SPINNAKERTOGGLE\":{\n
+    \       \"invalidUrl\": \"Host URL is invalid\"\n      }\n    },\n    \"SPINNAKERTOGGLE\":{\n
     \     \"TOOLTIP\":\"Switch On this toggle to configure the resource in a gitops
-    enabled Spinnaker instance\",\n      \"VALIDATION_MESSAGE\":{}\n    }\n    \n  },\n
+    enabled Spinnaker instance\",\n      \"VALIDATION_MESSAGE\":{}\n    }\n\n  },\n
     \ \"SERVICENOW\":{\n    \"HEADER\": \"Service Now\",\n    \"BODY\":\"<span><p>Service
     integration can be used to configure ServiceNow Custom stages in Spinnaker. In addition,
     it can also be used as a datasource for Approval Gate.</p><p><strong>Fields</strong>:</p><ul
@@ -2526,7 +2527,7 @@ data:
     Now Password\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Password
     cannot be empty\"\n      }\n    },\n    \"HOSTURL\":{\n      \"TOOLTIP\":\"Service
     Now Host URL\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Host URL
-    cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n    }\n
+    cannot be empty\",\n        \"invalidUrl\": \"Host URL is invalid\"\n      }\n    }\n
     \ }\n  ,\n  \"APPDYNAMICS\":{\n    \"HEADER\": \"APPDYNAMICS\",\n    \"BODY\":\"\",\n
     \   \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User defined name for the APPDYNAMICS
     account\",\n      \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
@@ -2535,42 +2536,43 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \   },\n    \"CONTROLLERHOST\":{\n      \"TOOLTIP\":\"APPDYNAMICS Controller Host\",\n
     \     \"VALIDATION_MESSAGE\":{\n        \"required\":\"Controller Host  cannot be
-    empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n    },\n    \"TEMPORARYACCESSTOKEN\":{\n
-    \     \"TOOLTIP\":\"APPDYNAMICS Personal Temporary Access Token\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Temporary Access Token cannot be empty\"\n      }\n    }\n
-    \ },\n  \"CLOUDWATCH\":{\n    \"HEADER\": \"AWS-CLOUDWATCH\",\n    \"BODY\":\"\",\n
-    \   \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User defined name for the AWS-CLOUDWATCH
-    account\",\n      \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Account
-    Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \   },\n    \"ACCESS_ID\":{\n      \"TOOLTIP\":\"AWS-CLOUDWATCH Access Key Id\",\n
-    \     \"VALIDATION_MESSAGE\":{\n        \"required\":\"Access Key Id cannot be empty\"\n
-    \     }\n    },\n    \"SECRET_KEY\":{\n      \"TOOLTIP\":\"AWS-CLOUDWATCH Secret
-    Access Key\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Secret Access
-    Key cannot be empty\"\n      }\n    }\n  },\n  \"DATADOG\":{\n    \"HEADER\": \"DATADOG\",\n
-    \   \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User defined name
-    for the DATADOG account\",\n      \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
-    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
-    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
-    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
-    \   \n    },\n    \"API_KEY\":{\n      \"TOOLTIP\":\"DATADOG Api Key\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"API key cannot be empty\"\n      }\n    },\n    \"APPLICATION_KEY\":{\n
-    \     \"TOOLTIP\":\"DATADOG Application Key\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Application Key cannot be empty\"\n      }\n    }\n  },\n
-    \ \"DYNATRACE\":{\n    \"HEADER\": \"Dynatrace\",\n    \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n
-    \     \"TOOLTIP\":\"User defined name for the Dynatrace account\",\n      \"VALIDATION_MESSAGE\":{\n
+    empty\",\n        \"invalidUrl\": \"Controller Host URL is invalid\"\n      }\n
+    \   },\n    \"TEMPORARYACCESSTOKEN\":{\n      \"TOOLTIP\":\"APPDYNAMICS Personal
+    Temporary Access Token\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Temporary
+    Access Token cannot be empty\"\n      }\n    }\n  },\n  \"CLOUDWATCH\":{\n    \"HEADER\":
+    \"AWS-CLOUDWATCH\",\n    \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User
+    defined name for the AWS-CLOUDWATCH account\",\n      \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
     other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
     \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
-    \"Account Name cannot start with numbers\"\n    }\n    },\n    \"END_POINT\":{\n
-    \     \"TOOLTIP\":\"Dynatrace URL\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Url
-    cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n    },\n
-    \   \"API_TOKEN\":{\n      \"TOOLTIP\":\"Dynatrace Personal Access Token\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Api Token cannot be empty\"\n      }\n    }\n  },\n  \"ELASTICSEARCH\":{\n
-    \   \"HEADER\": \"Elasticsearch\",\n    \"BODY\":\"<span><li><strong>Account Name</strong>:
-    User-defined account name for your Elasticsearch access.</li><li><strong>Endpoint</strong>:
-    Elasticsearch host address, from which you access the Elasticsearch</li><li><strong>Username</strong>:
+    \"Account Name cannot start with numbers\"\n    }\n    },\n    \"ACCESS_ID\":{\n
+    \     \"TOOLTIP\":\"AWS-CLOUDWATCH Access Key Id\",\n      \"VALIDATION_MESSAGE\":{\n
+    \       \"required\":\"Access Key Id cannot be empty\"\n      }\n    },\n    \"SECRET_KEY\":{\n
+    \     \"TOOLTIP\":\"AWS-CLOUDWATCH Secret Access Key\",\n      \"VALIDATION_MESSAGE\":{\n
+    \       \"required\":\"Secret Access Key cannot be empty\"\n      }\n    }\n  },\n
+    \ \"DATADOG\":{\n    \"HEADER\": \"DATADOG\",\n    \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n
+    \     \"TOOLTIP\":\"User defined name for the DATADOG account\",\n      \"VALIDATION_MESSAGE\":{\n
+    \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
+    other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
+    \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
+    \"Account Name cannot start with numbers\"\n    }\n\n    },\n    \"API_KEY\":{\n
+    \     \"TOOLTIP\":\"DATADOG Api Key\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"API
+    key cannot be empty\"\n      }\n    },\n    \"APPLICATION_KEY\":{\n      \"TOOLTIP\":\"DATADOG
+    Application Key\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Application
+    Key cannot be empty\"\n      }\n    }\n  },\n  \"DYNATRACE\":{\n    \"HEADER\":
+    \"Dynatrace\",\n    \"BODY\":\"\",\n    \"ACCOUNTNAME\":{\n      \"TOOLTIP\":\"User
+    defined name for the Dynatrace account\",\n      \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
+    Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
+    \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
+    \   },\n    \"END_POINT\":{\n      \"TOOLTIP\":\"Dynatrace URL\",\n      \"VALIDATION_MESSAGE\":{\n
+    \       \"required\":\"Endpoint Url cannot be empty\",\n        \"invalidUrl\":
+    \"Endpoint URL is invalid\"\n      }\n    },\n    \"API_TOKEN\":{\n      \"TOOLTIP\":\"Dynatrace
+    Personal Access Token\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Api
+    Token cannot be empty\"\n      }\n    }\n  },\n  \"ELASTICSEARCH\":{\n    \"HEADER\":
+    \"Elasticsearch\",\n    \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Elasticsearch access.</li><li><strong>Endpoint</strong>: Elasticsearch
+    host address, from which you access the Elasticsearch</li><li><strong>Username</strong>:
     Elasticsearch username </li><li><strong>Password</strong>: Elasticsearch password</li><li><strong>Kibana
     Endpoint</strong>: Elasticsearch Kibana host address, from which you access the
     Elasticsearch Kibana</li><li><strong>Kibana username</strong>: Elasticsearch Kibana
@@ -2582,19 +2584,19 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \   },\n    \"ENDPOINT\":{\n      \"TOOLTIP\":\"Elasticsearch host address, from
     which you access the Elasticsearch\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Elastic
-    End Point cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n
-    \   },\n    \"USERNAME\":{\n      \"TOOLTIP\":\"Elasticsearch username\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"noSpecialCharacters\": \"User Name cannot contain special characters other
-    than - and _\",\n        \"cannotContainSpace\":\"User Name cannot contain space\",\n
-    \       \"startingFromNumber\": \"User Name cannot start with numbers\"\n      }\n
-    \   },\n    \"PASSWORD\":{\n      \"TOOLTIP\":\"Elasticsearch password\",\n      \"VALIDATION_MESSAGE\":{\n
-    \       \"required\":\"Password cannot be empty\"\n      }\n    },\n    \"KIBANAENDPOINT\":{\n
-    \     \"TOOLTIP\":\"Elasticsearch Kibana host address, from which you access the
-    Elasticsearch Kibana\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Kibana
-    End Point cannot be empty\",\n        \"invalidUrl\": \"URL is invalid\"\n      }\n
-    \   },\n    \"KIBANAUSERNAME\":{\n      \"TOOLTIP\":\"Elasticsearch Kibana username\",\n
-    \     \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\": \"Kibana User Name
-    cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"Kibana
+    End Point cannot be empty\",\n        \"invalidUrl\": \"Elastic End Point is invalid\"\n
+    \     }\n    },\n    \"USERNAME\":{\n      \"TOOLTIP\":\"Elasticsearch username\",\n
+    \     \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\": \"User Name cannot
+    contain special characters other than - and _\",\n        \"cannotContainSpace\":\"User
+    Name cannot contain space\",\n        \"startingFromNumber\": \"User Name cannot
+    start with numbers\"\n      }\n    },\n    \"PASSWORD\":{\n      \"TOOLTIP\":\"Elasticsearch
+    password\",\n      \"VALIDATION_MESSAGE\":{\n        \"required\":\"Password cannot
+    be empty\"\n      }\n    },\n    \"KIBANAENDPOINT\":{\n      \"TOOLTIP\":\"Elasticsearch
+    Kibana host address, from which you access the Elasticsearch Kibana\",\n      \"VALIDATION_MESSAGE\":{\n
+    \       \"required\":\"Kibana End Point cannot be empty\",\n        \"invalidUrl\":
+    \"Kibana End Point is invalid\"\n      }\n    },\n    \"KIBANAUSERNAME\":{\n      \"TOOLTIP\":\"Elasticsearch
+    Kibana username\",\n      \"VALIDATION_MESSAGE\":{\n        \"noSpecialCharacters\":
+    \"Kibana User Name cannot contain special characters other than - and _\",\n        \"cannotContainSpace\":\"Kibana
     User Name cannot contain space\",\n        \"required\":\"Kibana User Name cannot
     be empty\",\n        \"startingFromNumber\": \"Kibana User Name cannot start with
     numbers\"\n      }\n    },\n    \"KIBANAPASSWORD\":{\n      \"TOOLTIP\":\"Elasticsearch
@@ -2610,7 +2612,7 @@ data:
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"URL\":{\n        \"TOOLTIP\":\"Graphite
     host address, from which you access the Graphite\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"End Point cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      }\n    },\n    \"GRAYLOG\":{\n      \"HEADER\":
+    \"End Point URL is invalid\"\n        }\n      }\n    },\n    \"GRAYLOG\":{\n      \"HEADER\":
     \"GRAYLOG\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
     account name for your Graylog access.</li><li><strong>Endpoint</strong>: Graylog
     host address, from which you access the Graylog </li><li><strong>Token</strong>:
@@ -2621,14 +2623,14 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"Graylog host address, from
     which you access the Graylog\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
-    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"GrayLog Personal Access Token\",\n
-    \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot be empty\"\n
-    \       }\n      }\n    },\n    \"NEWRELIC\":{\n      \"HEADER\": \"New Relic\",\n
-    \     \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined account name
-    for your NewRelic access.</li><li><strong>Api Key</strong>: The user's token to
-    authenticate with Newrelic</li><li><strong>Application Key</strong>: The application
-    key identifies which account the incoming data belongs to.</li><li><strong>Account
+    Point cannot be empty\",\n          \"invalidUrl\": \"End Point URL is invalid\"\n
+    \       }\n      },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"GrayLog Personal Access
+    Token\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot
+    be empty\"\n        }\n      }\n    },\n    \"NEWRELIC\":{\n      \"HEADER\": \"New
+    Relic\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your NewRelic access.</li><li><strong>Api Key</strong>: The user's
+    token to authenticate with Newrelic</li><li><strong>Application Key</strong>: The
+    application key identifies which account the incoming data belongs to.</li><li><strong>Account
     ID</strong>: Provide account ID to identify the account </li><li><strong>Query Key</strong>:
     Provide a query key to filter the data </li></span>\",\n      \"ACCOUNTNAME\":{\n
     \       \"TOOLTIP\":\"User-defined account name for your NewRelic access.\",\n        \"VALIDATION_MESSAGE\":{\n
@@ -2656,13 +2658,13 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"Prometheus host address, from
     which you access the Prometheus\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
-    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     },\n      \"USERNAME\":{\n        \"TOOLTIP\":\"Prometheus username\",\n        \"VALIDATION_MESSAGE\":{\n
-    \         \"noSpecialCharacters\": \"User Name cannot contain special characters
-    other than - and _\",\n          \"cannotContainSpace\":\"User Name cannot contain
-    space\",\n          \"required\":\"User Name cannot be empty\",\n          \"startingFromNumber\":
-    \"User Name cannot start with numbers\"\n        }\n      },\n      \"PASSWORD\":{\n
-    \       \"TOOLTIP\":\"Prometheus password\",\n        \"VALIDATION_MESSAGE\":{\n
+    Point cannot be empty\",\n          \"invalidUrl\": \"End Point URL is invalid\"\n
+    \       }\n      },\n      \"USERNAME\":{\n        \"TOOLTIP\":\"Prometheus username\",\n
+    \       \"VALIDATION_MESSAGE\":{\n          \"noSpecialCharacters\": \"User Name
+    cannot contain special characters other than - and _\",\n          \"cannotContainSpace\":\"User
+    Name cannot contain space\",\n          \"required\":\"User Name cannot be empty\",\n
+    \         \"startingFromNumber\": \"User Name cannot start with numbers\"\n        }\n
+    \     },\n      \"PASSWORD\":{\n        \"TOOLTIP\":\"Prometheus password\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"Password cannot be empty\"\n        }\n      }\n    },\n
     \   \"SPLUNK\":{\n      \"HEADER\": \"Splunk\",\n      \"BODY\":\"<span><li><strong>Account
     Name</strong>: User-defined account name for your Splunk access.</li><li><strong>Splunk
@@ -2676,7 +2678,7 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \     },\n      \"END_POINT\":{\n        \"TOOLTIP\":\"Splunk host address, from
     which you access the Splunk\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Splunk
-    Url  cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    Url  cannot be empty\",\n          \"invalidUrl\": \"Splunk Url is invalid\"\n        }\n
     \     },\n      \"PASSWORD\":{\n        \"TOOLTIP\":\"Splunk's password\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"Password cannot be empty\"\n        }\n      },\n      \"USER_NAME\":{\n
     \       \"TOOLTIP\":\"Splunk's user name\",\n        \"VALIDATION_MESSAGE\":{\n
@@ -2686,9 +2688,9 @@ data:
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"DASHBOARD_ENDPOINT\":{\n
     \       \"TOOLTIP\":\"Splunk Dashboard URL that you want to access\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"Splunk DashBoard Url cannot be empty\",\n          \"invalidUrl\":
-    \"URL is invalid\"\n        }\n      }\n    },\n    \"STACKDRIVER\":{\n      \"HEADER\":
-    \"Stackdriver\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User
-    defined name for the Stackdriver account\",\n        \"VALIDATION_MESSAGE\":{\n
+    \"Splunk DashBoard Url is invalid\"\n        }\n      }\n    },\n    \"STACKDRIVER\":{\n
+    \     \"HEADER\": \"Stackdriver\",\n      \"BODY\":\"\",\n      \"ACCOUNTNAME\":{\n
+    \       \"TOOLTIP\":\"User defined name for the Stackdriver account\",\n        \"VALIDATION_MESSAGE\":{\n
     \     \"noSpecialCharacters\": \"Account Name cannot contain special characters
     other than -\",\n      \"cannotContainSpace\":\"Account Name cannot contain space\",\n
     \     \"required\":\"Account Name cannot be empty\",\n      \"startingFromNumber\":
@@ -2710,7 +2712,7 @@ data:
     Zone\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\": \"Zone
     cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Zone
     cannot contain space\",\n      \"required\":\"Zone cannot be empty\",\n      \"startingFromNumber\":
-    \"Zone cannot start with numbers\"\n    }\n      }\n    },\n    \n    \"VMWARETANZU\":{\n
+    \"Zone cannot start with numbers\"\n    }\n      }\n    },\n\n    \"VMWARETANZU\":{\n
     \     \"HEADER\": \"VMWare Tanzu Observability\",\n      \"BODY\":\"<span><li><strong>Account
     Name</strong>: User-defined account name for your VMWare Tanzu access</li><li><strong>Endpoint</strong>:
     VMWare Tanzu host address, from which you access the VMWare Tanzu</li><li><strong>Email</strong>:
@@ -2723,10 +2725,10 @@ data:
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"END_POINT\":{\n
     \       \"TOOLTIP\":\"VMWare Tanzu host address, from which you access the VMWare
     Tanzu\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End Point cannot
-    be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n
+    be empty\",\n          \"invalidUrl\": \"End Point is invalid\"\n        }\n      },\n
     \     \"EMAIL\":{\n        \"TOOLTIP\":\"Provide the user's registered and authorized
-    email\",\n        \"VALIDATION_MESSAGE\":{\n          \"email\":\"Email Id is invalid\",\n
-    \         \"required\":\"Email Id cannot be empty\"\n        }\n      },\n      \"API_TOKEN\":{\n
+    email\",\n        \"VALIDATION_MESSAGE\":{\n          \"email\":\"Email is invalid\",\n
+    \         \"required\":\"Email cannot be empty\"\n        }\n      },\n      \"API_TOKEN\":{\n
     \       \"TOOLTIP\":\"The user's API token\",\n        \"VALIDATION_MESSAGE\":{\n
     \         \"required\":\"Api Token cannot be empty\"\n        }\n      }\n    },\n
     \   \"MSTEAMS\":{\n      \"HEADER\": \"Microsoft Teams\",\n      \"BODY\":\"\"\n
@@ -2757,12 +2759,12 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \     },\n      \"ENDPOINT\":{\n        \"TOOLTIP\":\"OPA server host address, such
     as https://opa:8181\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"End
-    Point cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     }\n    },\n    \"AQUAWAVE\":{\n      \"HEADER\": \"Aqua Wave\",\n      \"BODY\":\"<span><li><strong>Account
-    Name</strong>: User-defined account name for your Aqua Wave access.</li><li><strong>Username</strong>:
-    The Aquawave username</li><li><strong>Token</strong>: The user's token.</li></span>\",\n
-    \     \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined account name for your
-    Aqua Wave access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
+    Point cannot be empty\",\n          \"invalidUrl\": \"End Point URL is invalid\"\n
+    \       }\n      }\n    },\n    \"AQUAWAVE\":{\n      \"HEADER\": \"Aqua Wave\",\n
+    \     \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined account name
+    for your Aqua Wave access.</li><li><strong>Username</strong>: The Aquawave username</li><li><strong>Token</strong>:
+    The user's token.</li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
+    account name for your Aqua Wave access.\",\n        \"VALIDATION_MESSAGE\":{\n      \"noSpecialCharacters\":
     \"Account Name cannot contain special characters other than -\",\n      \"cannotContainSpace\":\"Account
     Name cannot contain space\",\n      \"required\":\"Account Name cannot be empty\",\n
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
@@ -2795,13 +2797,13 @@ data:
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"ENDPOINT\":{\n
     \       \"TOOLTIP\":\"Jfrog Xray host address, from which you access the Jfrog Xray
     instance\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Endpoint
-    cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n
-    \     \"TOKEN\":{\n        \"TOOLTIP\":\"The user's token from jfrog xray to authenticate\",\n
-    \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot be empty\"\n
-    \       }\n      }\n    },\n    \"PRISMACLOUD\":{\n      \"HEADER\": \"Prisma Cloud\",\n
-    \     \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined account name
-    for your Prisma Cloud access.</li><li><strong>Host Url</strong>: Your Prisma Cloud
-    host address, from which you access the Prisma Cloud instance</li><li><strong>Access
+    cannot be empty\",\n          \"invalidUrl\": \"End Point URL is invalid\"\n        }\n
+    \     },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"The user's token from jfrog xray
+    to authenticate\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token
+    cannot be empty\"\n        }\n      }\n    },\n    \"PRISMACLOUD\":{\n      \"HEADER\":
+    \"Prisma Cloud\",\n      \"BODY\":\"<span><li><strong>Account Name</strong>: User-defined
+    account name for your Prisma Cloud access.</li><li><strong>Host Url</strong>: Your
+    Prisma Cloud host address, from which you access the Prisma Cloud instance</li><li><strong>Access
     Key ID</strong>: The user's access key who has access to the Prisma Cloud. If you
     are unsure, consult your Prisma Cloud administrator to get an access key.</li><li><strong>Secret
     key</strong>: The user's secret key</li></span>\",\n      \"ACCOUNTNAME\":{\n        \"TOOLTIP\":\"User-defined
@@ -2812,13 +2814,13 @@ data:
     \"Account Name cannot start with numbers\"\n    }\n      },\n      \"HOSTURL\":{\n
     \       \"TOOLTIP\":\"Prisma Cloud host address, from which you access the Prisma
     Cloud instance\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Host
-    URL cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
-    \     },\n      \"APPLICATIONURL\":{\n        \"TOOLTIP\":\"Prisma Cloud Application
-    URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Application URL
-    cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n      },\n
-    \     \"ACCESSKEYID\":{\n        \"TOOLTIP\":\"The user's access key who has access
-    to the Prisma Cloud. If you are unsure, consult your Prisma Cloud administrator
-    to get an access key.\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Access
+    URL cannot be empty\",\n          \"invalidUrl\": \"End Point URL is invalid\"\n
+    \       }\n      },\n      \"APPLICATIONURL\":{\n        \"TOOLTIP\":\"Prisma Cloud
+    Application URL\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Application
+    URL cannot be empty\",\n          \"invalidUrl\": \"Application URL is invalid\"\n
+    \       }\n      },\n      \"ACCESSKEYID\":{\n        \"TOOLTIP\":\"The user's access
+    key who has access to the Prisma Cloud. If you are unsure, consult your Prisma Cloud
+    administrator to get an access key.\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Access
     Key Id cannot be empty\"\n        }\n      },\n      \"SECRETKEY\":{\n        \"TOOLTIP\":\"The
     user's secret key\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Secret
     Key cannot be empty\"\n        }\n      }\n    },\n    \"SONARQUBE\":{\n      \"HEADER\":
@@ -2832,7 +2834,7 @@ data:
     \     \"startingFromNumber\": \"Account Name cannot start with numbers\"\n    }\n
     \     },\n      \"HOSTURL\":{\n        \"TOOLTIP\":\"Sonarqube host address, from
     which you access the Sonaqube instance\",\n        \"VALIDATION_MESSAGE\":{\n          \"required\":\"Host
-    URL cannot be empty\",\n          \"invalidUrl\": \"URL is invalid\"\n        }\n
+    URL cannot be empty\",\n          \"invalidUrl\": \"Host URL is invalid\"\n        }\n
     \     },\n      \"TOKEN\":{\n        \"TOOLTIP\":\"The user's token (it is optional)\",\n
     \       \"VALIDATION_MESSAGE\":{\n          \"required\":\"Token cannot be empty\"\n
     \       }\n      }\n    },\n    \"AUTOPILOT\":{\n      \"HEADER\": \"Autopilot\",\n
@@ -3081,8 +3083,8 @@ metadata:
     app: oes
     component: ui
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/templates/oes-ui/oes-ui-nginxconf.yaml
 apiVersion: v1
@@ -3161,18 +3163,18 @@ metadata:
     app: oes
     component: ui
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 ---
 # Source: isdargo/charts/minio/templates/pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: autopilot-minio
+  name: isd-minio
   labels:
     app: minio
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   accessModes:
@@ -3189,7 +3191,7 @@ metadata:
   labels:
     app: openldap
     chart: openldap-1.2.3
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   accessModes:
@@ -3202,11 +3204,11 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: autopilot-minio-update-prometheus-secret
+  name: isd-minio-update-prometheus-secret
   labels:
     app: minio-update-prometheus-secret
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 rules:
   - apiGroups:
@@ -3219,7 +3221,7 @@ rules:
       - update
       - patch
     resourceNames:
-      - autopilot-minio-prometheus
+      - isd-minio-prometheus
   - apiGroups:
       - ""
     resources:
@@ -3233,7 +3235,7 @@ rules:
     verbs:
       - get
     resourceNames:
-      - autopilot-minio
+      - isd-minio
 ---
 # Source: isdargo/templates/forwarder/create-controller-secret.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -3249,19 +3251,19 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: autopilot-minio-update-prometheus-secret
+  name: isd-minio-update-prometheus-secret
   labels:
     app: minio-update-prometheus-secret
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: autopilot-minio-update-prometheus-secret
+  name: isd-minio-update-prometheus-secret
 subjects:
   - kind: ServiceAccount
-    name: autopilot-minio-update-prometheus-secret
+    name: isd-minio-update-prometheus-secret
     namespace: "opsmx-autopilot"
 ---
 # Source: isdargo/templates/forwarder/create-controller-secret.yaml
@@ -3281,11 +3283,11 @@ roleRef:
 apiVersion: v1
 kind: Service
 metadata:
-  name: autopilot-minio
+  name: isd-minio
   labels:
     app: minio
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   type: ClusterIP
@@ -3296,7 +3298,7 @@ spec:
       targetPort: 9000
   selector:
     app: minio
-    release: autopilot
+    release: isd
 ---
 # Source: isdargo/charts/openldap/templates/service.yaml
 apiVersion: v1
@@ -3306,7 +3308,7 @@ metadata:
   labels:
     app: openldap
     chart: openldap-1.2.3
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   ports:
@@ -3320,18 +3322,18 @@ spec:
       targetPort: ssl-ldap-port
   selector:
     app: openldap
-    release: autopilot
+    release: isd
   type: ClusterIP
 ---
 # Source: isdargo/charts/redis/templates/headless-svc.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: autopilot-redis-headless
+  name: isd-redis-headless
   labels:
     app: redis
     chart: redis-10.5.3
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   type: ClusterIP
@@ -3342,17 +3344,17 @@ spec:
     targetPort: redis
   selector:
     app: redis
-    release: autopilot
+    release: isd
 ---
 # Source: isdargo/charts/redis/templates/redis-master-svc.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: autopilot-redis-master
+  name: isd-redis-master
   labels:
     app: redis
     chart: redis-10.5.3
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   type: ClusterIP
@@ -3362,7 +3364,7 @@ spec:
     targetPort: redis
   selector:
     app: redis
-    release: autopilot
+    release: isd
     role: master
 ---
 # Source: isdargo/templates/carina/service.yaml
@@ -3373,8 +3375,8 @@ metadata:
     app: oes
     component: carina
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-carina
 spec:
   ports:
@@ -3385,7 +3387,6 @@ spec:
   selector:
     app: oes
     component: carina
-  sessionAffinity: None
   type: ClusterIP
 ---
 # Source: isdargo/templates/forwarder/oes-forwarder-svc-agent.yaml
@@ -3397,8 +3398,8 @@ metadata:
     agent.opsmx.com/name: controller1
     agent.opsmx.com/role: controller
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 spec:
   selector:
     app: opsmx-controller-controller1
@@ -3423,8 +3424,8 @@ metadata:
     agent.opsmx.com/name: controller1
     agent.opsmx.com/role: controller
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 spec:
   selector:
     app: opsmx-controller-controller1
@@ -3442,8 +3443,8 @@ metadata:
     agent.opsmx.com/name: controller1
     agent.opsmx.com/role: controller
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 spec:
   selector:
     app: opsmx-controller-controller1
@@ -3461,8 +3462,8 @@ metadata:
     app: oes
     component: auditclient
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-audit-client
 spec:
   ports:
@@ -3483,8 +3484,8 @@ metadata:
     app: oes
     component: auditservice
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-audit-service
 spec:
   ports:
@@ -3505,8 +3506,8 @@ metadata:
     app: oes
     component: autopilot
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-autopilot
 spec:
   type: ClusterIP
@@ -3529,8 +3530,8 @@ metadata:
     app: oes
     component: dashboard
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-dashboard
 spec:
   type: ClusterIP
@@ -3551,8 +3552,8 @@ metadata:
     app: oes
     component: datascience
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-datascience
 spec:
   ports:
@@ -3573,8 +3574,8 @@ metadata:
     app: oes
     component: db
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-db
 spec:
   type: ClusterIP
@@ -3595,11 +3596,11 @@ metadata:
     app: oes
     component: gate
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-gate
 spec:
-  type: 
+  type: ClusterIP
   ports:
   - name: "https"
     port: 443
@@ -3623,8 +3624,8 @@ metadata:
     app: oes
     component: platform
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-platform
 spec:
   type: ClusterIP
@@ -3645,8 +3646,8 @@ metadata:
     app: oes
     component: sapor
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-sapor
 spec:
   type: ClusterIP
@@ -3666,11 +3667,11 @@ metadata:
     app: oes
     component: ui
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-ui
 spec:
-  type: 
+  type: ClusterIP
   ports:
   - name: "https"
     port: 443
@@ -3688,15 +3689,15 @@ kind: Service
 metadata:
   labels:
     app: oes
-    component: visibility 
+    component: visibility
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-visibility
 spec:
   type: ClusterIP
   ports:
-  - name: visibility 
+  - name: visibility
     protocol: TCP
     port: 8096
     targetPort: 8096
@@ -3711,8 +3712,8 @@ metadata:
   name: opa
   labels:
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 spec:
   selector:
     app: opa
@@ -3730,8 +3731,8 @@ metadata:
     app: oes
     component: rabbitmq
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: rabbitmq-service
 spec:
   ports:
@@ -3752,11 +3753,11 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: autopilot-minio
+  name: isd-minio
   labels:
     app: minio
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   strategy:
@@ -3767,18 +3768,18 @@ spec:
   selector:
     matchLabels:
       app: minio
-      release: autopilot
+      release: isd
   template:
     metadata:
-      name: autopilot-minio
+      name: isd-minio
       labels:
         app: minio
-        release: autopilot
+        release: isd
       annotations:
-        checksum/secrets: dcab2cce32efbb6ea751230ff2df33c75bf117905de3fe03d397c00ddf61861a
-        checksum/config: d6485e491ced2d67cf5c0cd8d3c7ad6d54258b68876f24c6d8b7f6c722dbe900
+        checksum/secrets: 0e7fab1c3058994997feaa92931063f8fc4c7f719d54fd3ef3459505a6a61533
+        checksum/config: 7a7ac5513fcd53ca17fde80ebf50780809224b63001a3969ca32fcaf1caf5999
     spec:
-      serviceAccountName: "autopilot-minio"
+      serviceAccountName: "isd-minio"
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -3801,12 +3802,12 @@ spec:
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: autopilot-minio
+                  name: isd-minio
                   key: accesskey
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: autopilot-minio
+                  name: isd-minio
                   key: secretkey
           resources:
             requests:
@@ -3814,10 +3815,10 @@ spec:
       volumes:
         - name: export
           persistentVolumeClaim:
-            claimName: autopilot-minio
+            claimName: isd-minio
         - name: minio-user
           secret:
-            secretName: autopilot-minio
+            secretName: isd-minio
 ---
 # Source: isdargo/charts/openldap/templates/deployment.yaml
 apiVersion: apps/v1
@@ -3829,22 +3830,22 @@ metadata:
   labels:
     app: openldap
     chart: openldap-1.2.3
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: openldap
-      release: autopilot
+      release: isd
   template:
     metadata:
       annotations:
-        checksum/configmap-env: f7f5ceb3d66f76545802fed58e099ca155b2a2543685ee4db6a49c7f250e3c92
-        checksum/configmap-customldif: 7bd85ef84359d2acc19906dad85d892826f8ec966f5fa2f19a11a27346820ca1
+        checksum/configmap-env: 2481a3f2da612328f2b2cb57408d42232b8fb5b34861131e3172a9f3012a72bd
+        checksum/configmap-customldif: daeba1008b0179c030b3d1d9af1941bbb0f734b764bf7c19bd6dc15470d59211
       labels:
         app: openldap
-        release: autopilot
+        release: isd
     spec:
       initContainers:
       - name: openldap-init-ldif
@@ -3925,8 +3926,8 @@ metadata:
     app: oes
     component: carina
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-carina
 spec:
   progressDeadlineSeconds: 600
@@ -3946,13 +3947,13 @@ spec:
         app: oes
         component: carina
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
       annotations:
-        checksum/secret: 98c2ead20b78215b2d74aaa8b025ca6ea04c85758ae12821c9d2036d2d6bb975
+        checksum/secret: 3317d0843d09e8e86afa45102c110412f46f8d4715da5fdf1208733b21c1ff37
     spec:
       containers:
-      - image: opsmx11/carina-manager:v1.1.11
+      - image: quay.io/opsmxpublic/carina-manager:v1.4.2
         imagePullPolicy: IfNotPresent
         name: oes-carina
         ports:
@@ -3961,7 +3962,7 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /app/secrets/controller-ca.crt 
+        - mountPath: /app/secrets/controller-ca.crt
           name: ca-certs-volume
           subPath: tls.crt
         - mountPath: /app/secrets/controller-control/tls.crt
@@ -3972,10 +3973,8 @@ spec:
           subPath: tls.key
         - mountPath: /app/config/carina-manager.yaml
           name: carina-volume
-          subPath: carina-manager.yaml          
+          subPath: carina-manager.yaml
       dnsPolicy: ClusterFirst
-      imagePullSecrets:
-      - name: opsmx11-secret
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -4005,8 +4004,8 @@ metadata:
     agent.opsmx.com/name: controller1
     agent.opsmx.com/role: controller
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 spec:
   replicas: 1
   selector:
@@ -4019,8 +4018,8 @@ spec:
         agent.opsmx.com/name: controller1
         agent.opsmx.com/role: controller
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
       annotations:
         pullversion: "16"
         checksum/configmap: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
@@ -4083,8 +4082,8 @@ metadata:
     app: oes
     component: auditclient
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-audit-client
 spec:
   replicas: 1
@@ -4103,11 +4102,11 @@ spec:
         app: oes
         component: auditclient
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
-      - image: opsmx11/oes-audit-client:v4.1.0-rc1 
+      - image: quay.io/opsmxpublic/ubi8-oes-audit-client:v4.1.1
         imagePullPolicy: IfNotPresent
         name: oes-audit-client
         ports:
@@ -4141,8 +4140,6 @@ spec:
         - mountPath: /opsmx/conf/standard-error-code.csv
           name: standard-error-conf
           subPath: standard-error-codes.csv
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - secret:
           items:
@@ -4171,8 +4168,8 @@ metadata:
     app: oes
     component: auditservice
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-audit-service
 spec:
   replicas: 1
@@ -4191,11 +4188,11 @@ spec:
         app: oes
         component: auditservice
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
-      - image: opsmx11/oes-audit-service:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-audit-service:v4.1.1
         imagePullPolicy: IfNotPresent
         name: oes-audit
         ports:
@@ -4230,8 +4227,6 @@ spec:
         - mountPath: /opsmx/conf/standard-error-code.csv
           name: standard-error-conf
           subPath: standard-error-codes.csv
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       volumes:
       - secret:
@@ -4262,8 +4257,8 @@ metadata:
     app: oes
     component: autopilot
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
 spec:
   replicas: 1
   selector:
@@ -4276,8 +4271,8 @@ spec:
         app: oes
         component: autopilot
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
       annotations:
         configmap/checksum: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         prometheus.io/scrape: "true"
@@ -4301,14 +4296,12 @@ spec:
               path: standard-error-codes.csv
             name: standard-error-codes-config
           name: standard-error-conf
-      imagePullSecrets:
-      - name: opsmx11-secret
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
         command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-        - image: opsmx11/oes-autopilot:cf1fe39f2-1009
+        - image: quay.io/opsmxpublic/ubi8-oes-autopilot:v4.1.1
           imagePullPolicy: IfNotPresent
           name: oes-autopilot
           resources:
@@ -4351,8 +4344,8 @@ metadata:
     app: oes
     component: dashboard
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-dashboard
 spec:
   replicas: 1
@@ -4372,11 +4365,11 @@ spec:
         app: oes
         component: dashboard
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
-      - image: opsmx11/oes-dashboard:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-dashboard:v4.1.1
         name: oes-dashboard
         ports:
         - containerPort: 8094
@@ -4405,8 +4398,6 @@ spec:
             port: 8094
           initialDelaySeconds: 30
           periodSeconds: 60
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - name: dashboard-config
         configMap:
@@ -4434,8 +4425,8 @@ metadata:
     app: oes
     component: datascience
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-datascience
 spec:
   replicas: 1
@@ -4454,11 +4445,11 @@ spec:
         app: oes
         component: datascience
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
-      - image: opsmx11/oes-datascience:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-datascience:v4.1.1
         imagePullPolicy: IfNotPresent
         name: oes-datascience
         ports:
@@ -4480,8 +4471,6 @@ spec:
         - mountPath: /home/ubuntu/datascience/app_config.yaml
           name: datascience-config-volume
           subPath: app-config.yml
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - secret:
           secretName: oes-datascience-config
@@ -4496,8 +4485,8 @@ metadata:
     app: oes
     component: gate
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-gate
 spec:
   replicas: 1
@@ -4516,11 +4505,11 @@ spec:
         app: oes
         component: gate
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
-      - image: opsmx11/gate:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-gate:v4.1.1
         name: oes-gate
         env:
         - name: spring_profiles_active
@@ -4548,8 +4537,6 @@ spec:
             port: 8084
           initialDelaySeconds: 60
           periodSeconds: 60
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - name: gate-volume
         secret:
@@ -4570,8 +4557,8 @@ metadata:
     app: oes
     component: platform
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-platform
 spec:
   replicas: 1
@@ -4591,15 +4578,15 @@ spec:
         app: oes
         component: platform
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
         command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: opsmx11/oes-platform:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-platform:v4.1.1
         name: oes-platform
         ports:
         - containerPort: 8095
@@ -4628,8 +4615,6 @@ spec:
         - mountPath: /opsmx/conf/standard-error-code.csv
           name: standard-error-conf
           subPath: standard-error-codes.csv
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - name: platform-config-volume
         secret:
@@ -4656,8 +4641,8 @@ metadata:
     app: oes
     component: sapor
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-sapor
 spec:
   replicas: 1
@@ -4668,7 +4653,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: 7ec09466724e3a838b137945ce34d1da28e6083f37bfad9cf03fbc17e15b6825
+        checksum/configmap: 5b9ccb0fdeed3b780774c35c9d82be3abf4df19a316a39e29a5032dbac191beb
         checksum/configmap: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         prometheus.io/scrape: "true"
         prometheus_io_path: /mgmt/prometheus
@@ -4677,15 +4662,15 @@ spec:
         app: oes
         component: sapor
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
         command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: opsmx11/oes-sapor:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-sapor:v4.1.1
         name: oes-sapor
         env:
         ports:
@@ -4725,8 +4710,6 @@ spec:
           initialDelaySeconds: 60
           periodSeconds: 10
           failureThreshold: 10
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - secret:
           secretName: oes-control-secret
@@ -4759,8 +4742,8 @@ metadata:
     app: oes
     component: ui
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-ui
 spec:
   replicas: 1
@@ -4776,11 +4759,11 @@ spec:
         app: oes
         component: ui
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
-      - image: opsmx11/oes-ui:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-ui:v4.1.1
         name: oes-ui
         ports:
         - containerPort: 8080
@@ -4806,8 +4789,6 @@ spec:
             port: 8080
           initialDelaySeconds: 15
           periodSeconds: 5
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - configMap:
           defaultMode: 420
@@ -4826,8 +4807,8 @@ metadata:
     app: oes
     component: visibility
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-visibility
 spec:
   replicas: 1
@@ -4839,7 +4820,7 @@ spec:
   template:
     metadata:
       annotations:
-        configmap/checksum: 4da1b59521ab323f4e57e3ec71a44c101d209d1e4758aa09a9b54acf10e54050
+        configmap/checksum: 4bc045e18dbbf5885e9a3019147085e9e94b6dd4b139aa3f0a8de617afa278ca
         prometheus.io/scrape: "true"
         prometheus_io_path: /mgmt/prometheus
         prometheus_io_port: "8096"
@@ -4847,15 +4828,15 @@ spec:
         app: oes
         component: visibility
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
         command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: opsmx11/oes-visibility:v4.1.0-rc1
+      - image: quay.io/opsmxpublic/ubi8-oes-visibility:v4.1.1
         name: oes-visibility
         ports:
         - containerPort: 8096
@@ -4885,8 +4866,6 @@ spec:
             port: 8096
           initialDelaySeconds: 30
           periodSeconds: 60
-      imagePullSecrets:
-      - name: opsmx11-secret
       volumes:
       - name: visibility-config
         secret:
@@ -4913,8 +4892,8 @@ metadata:
     app: oes
     component: rabbitmq
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: rabbitmq
 spec:
   replicas: 1
@@ -4929,8 +4908,8 @@ spec:
         app: oes
         component: rabbitmq
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
       containers:
       - image: quay.io/opsmxpublic/rabbitmq:3-management
@@ -4940,8 +4919,6 @@ spec:
         - containerPort: 5672
           protocol: TCP
         resources: {}
-      imagePullSecrets:
-      - name: opsmx11-secret
       restartPolicy: Always
       securityContext:
         fsGroup: 1000
@@ -4950,37 +4927,37 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: autopilot-redis-master
+  name: isd-redis-master
   labels:
     app: redis
     chart: redis-10.5.3
-    release: autopilot
+    release: isd
     heritage: Helm
 spec:
   selector:
     matchLabels:
       app: redis
-      release: autopilot
+      release: isd
       role: master
-  serviceName: autopilot-redis-headless
+  serviceName: isd-redis-headless
   template:
     metadata:
       labels:
         app: redis
         chart: redis-10.5.3
-        release: autopilot
+        release: isd
         role: master
       annotations:
-        checksum/health: be08c718796d380994e06b436d20ed309f7c431d57a6013c13a762bb621478f0
-        checksum/configmap: c7f3457e5aa9586a93342d564b46aa87b8ca3d0a1dd9f8de67487d7ac8879dfb
-        checksum/secret: 53cf7aa85242da8d052cf51d9e7a573d5b5dec4e2b7e8efa97560b1a694c37e8
+        checksum/health: 36567aac6587929dc97be63c28c0aa1ec58d167572f3e5f191536195dc588d15
+        checksum/configmap: 42a460f87c190197092321f0ae70720d271a2f6738150858f02b13ca057dae95
+        checksum/secret: 92c3542fca96bee16e081be3a51ac49fa2ad66360cd283b768155ca7bae80c9e
         moniker.spinnaker.io/application: spin
     spec:      
       securityContext:
         fsGroup: 1001
       serviceAccountName: "default"
       containers:
-      - name: autopilot-redis
+      - name: isd-redis
         image: "quay.io/opsmxpublic/bitnami-redis:5.0.7-debian-10-r0"
         imagePullPolicy: "IfNotPresent"
         securityContext:
@@ -5011,7 +4988,7 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: autopilot-redis
+              name: isd-redis
               key: redis-password
         - name: REDIS_PORT
           value: "6379"
@@ -5055,11 +5032,11 @@ spec:
       volumes:
       - name: health
         configMap:
-          name: autopilot-redis-health
+          name: isd-redis-health
           defaultMode: 0755
       - name: config
         configMap:
-          name: autopilot-redis
+          name: isd-redis
       - name: redis-tmp-conf
         emptyDir: {}
   volumeClaimTemplates:
@@ -5067,7 +5044,7 @@ spec:
         name: redis-data
         labels:
           app: redis
-          release: autopilot
+          release: isd
           heritage: Helm
           component: master
       spec:
@@ -5089,8 +5066,8 @@ metadata:
     app: oes
     component: db
     heritage: "Helm"
-    release: "autopilot"
-    chart: "isdargo-1.0.0"
+    release: "isd"
+    chart: "isdargo-4.1.1"
   name: oes-db
 spec:
   podManagementPolicy: OrderedReady
@@ -5107,13 +5084,11 @@ spec:
         app: oes
         component: db
         heritage: "Helm"
-        release: "autopilot"
-        chart: "isdargo-1.0.0"
+        release: "isd"
+        chart: "isdargo-4.1.1"
     spec:
-      imagePullSecrets:
-      - name: opsmx11-secret
       containers:
-      - image: opsmx11/ubi8-oes-db:v3.0.0
+      - image: quay.io/opsmxpublic/ubi8-oes-db:v3.0.0
         imagePullPolicy: IfNotPresent
         name: oes-db
         lifecycle:
@@ -5166,8 +5141,8 @@ spec:
            valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-         args: 
-         - "$(NAMESPACE)" 
+         args:
+         - "$(NAMESPACE)"
        restartPolicy: Never
        serviceAccount: create-controller-secret
 ---
@@ -5175,11 +5150,11 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: autopilot-minio-make-bucket-job
+  name: isd-minio-make-bucket-job
   labels:
     app: minio-make-bucket-job
     chart: minio-8.0.9
-    release: autopilot
+    release: isd
     heritage: Helm
   annotations:
     "helm.sh/hook": post-install,post-upgrade
@@ -5189,7 +5164,7 @@ spec:
     metadata:
       labels:
         app: minio-job
-        release: autopilot
+        release: isd
     spec:
       restartPolicy: OnFailure      
       volumes:
@@ -5197,10 +5172,10 @@ spec:
           projected:
             sources:
             - configMap:
-                name: autopilot-minio
+                name: isd-minio
             - secret:
-                name: autopilot-minio
-      serviceAccountName: "autopilot-minio"
+                name: isd-minio
+      serviceAccountName: "isd-minio"
       containers:
       - name: minio-mc
         image: "minio/mc:RELEASE.2020-11-25T23-04-07Z"
@@ -5208,7 +5183,7 @@ spec:
         command: ["/bin/sh", "/config/initialize"]
         env:
           - name: MINIO_ENDPOINT
-            value: autopilot-minio
+            value: isd-minio
           - name: MINIO_PORT
             value: "9000"
         volumeMounts:
