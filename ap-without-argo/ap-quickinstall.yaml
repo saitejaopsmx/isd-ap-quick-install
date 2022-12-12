@@ -1,4 +1,9 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opsmx-autopilot
+---
 # Source: isdargo/charts/minio/templates/post-install-prometheus-metrics-serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -15,7 +20,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: "isd-minio"
-  namespace: "opsmx-argo"
+  namespace: "opsmx-autopilot"
   labels:
     app: minio
     chart: minio-8.0.9
@@ -3259,7 +3264,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: isd-minio-update-prometheus-secret
-    namespace: "opsmx-argo"
+    namespace: "opsmx-autopilot"
 ---
 # Source: isdargo/templates/forwarder/create-controller-secret.yaml
 apiVersion: rbac.authorization.k8s.io/v1
