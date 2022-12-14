@@ -1,4 +1,4 @@
-# isd-argo-elas-prom-quick-install 
+# isd-argo-elastic-prom-quick-install 
 
 **Quick Install for ISD,Argo,Promethues and Elastic Search**.
 To experience ISD quickly, you can install it and deploy your applications. Note that the instructions below are intended to get you started quickly and try out ISD functionality. This is not suitable for production or any environment where security is a concern.
