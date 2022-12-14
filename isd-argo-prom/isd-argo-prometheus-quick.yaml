@@ -9344,17 +9344,6 @@ spec:
     served: true
     storage: true                
 ---
-# Source: isdargo/charts/elasticsearch/templates/poddisruptionbudget.yaml
-apiVersion: policy/v1beta1
-kind: PodDisruptionBudget
-metadata:
-  name: "elasticsearch-master-pdb"
-spec:
-  maxUnavailable: 1
-  selector:
-    matchLabels:
-      app: "elasticsearch-master"
----
 # Source: isdargo/charts/argo-cd/templates/argocd-application-controller/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -9466,17 +9455,6 @@ metadata:
     app.kubernetes.io/version: "v1.2.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: argo-rollouts
----
-# Source: isdargo/charts/fluent-bit/templates/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app: fluent-bit
-    chart: fluent-bit-2.8.2
-    heritage: Helm
-    release: isd
-  name: isd-fluent-bit
 ---
 # Source: isdargo/charts/minio/templates/post-install-prometheus-metrics-serviceaccount.yaml
 apiVersion: v1
@@ -9610,20 +9588,6 @@ metadata:
     app.kubernetes.io/part-of: argo-rollouts
 type: Opaque
 stringData:
----
-# Source: isdargo/charts/fluent-bit/templates/secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: "isd-fluent-bit-es-tls-secret"
-  labels:
-    app: fluent-bit
-    chart: fluent-bit-2.8.2
-    heritage: Helm
-    release: isd
-type: Opaque
-data:
-  es-tls-ca.crt: ""
 ---
 # Source: isdargo/charts/minio/templates/secrets.yaml
 apiVersion: v1
@@ -10796,110 +10760,6 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: argo-rollouts
 data:
----
-# Source: isdargo/charts/fluent-bit/templates/config.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: isd-fluent-bit-config
-  labels:
-    app: fluent-bit
-    chart: fluent-bit-2.8.2
-    heritage: Helm
-    release: isd
-data:
-  fluent-bit-service.conf: |
-    [SERVICE]
-        Flush        1
-        Daemon       Off
-        Log_Level    info
-        Parsers_File parsers.conf
-
-  fluent-bit-input.conf: |
-    [INPUT]
-        Name             tail
-        Path             /var/log/containers/*.log
-        Parser           docker
-        Tag              kube.*
-        Refresh_Interval 5
-        Mem_Buf_Limit    5MB
-        Skip_Long_Lines  On
-        
-
-  fluent-bit-filter.conf: |
-    [FILTER]
-        Name                kubernetes
-        Match               kube.*
-        Kube_Tag_Prefix     kube.var.log.containers.
-        Kube_URL            https://kubernetes.default.svc:443
-        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-        Merge_Log           On
-        K8S-Logging.Parser  On
-        K8S-Logging.Exclude On
-        
-
-  fluent-bit-output.conf: |
-
-    [OUTPUT]
-        Name  es
-        Match *
-        Host  elasticsearch-master
-        Port  9200
-        Logstash_Format On
-        Retry_Limit False
-        Type  flb_type
-        Time_Key @timestamp
-        Replace_Dots On
-        Logstash_Prefix kubernetes_cluster
-
-
-
-        
-
-
-  fluent-bit.conf: |
-    @INCLUDE fluent-bit-service.conf
-    @INCLUDE fluent-bit-input.conf
-    @INCLUDE fluent-bit-filter.conf
-    @INCLUDE fluent-bit-output.conf
-
-  parsers.conf: |
----
-# Source: isdargo/charts/fluent-bit/templates/tests/test-configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: isd-fluent-bit-test
-  labels:
-    app: isd-fluent-bit
-    chart: "fluent-bit-2.8.2"
-    heritage: "Helm"
-    release: "isd"
-data:
-  run.sh: |-
-    @test "Test Elasticssearch Indices" {
-      url="http://elasticsearch-master:9200/_cat/indices?format=json"
-      body=$(curl $url)
-
-      result=$(echo $body | jq -cr '.[] | select(.index | contains("kubernetes_cluster"))')
-      [ "$result" != "" ]
-
-      result=$(echo $body | jq -cr '.[] | select((.index | contains("kubernetes_cluster")) and (.health != "green"))')
-      [ "$result" == "" ]
-    }
-
-  fluentd.conf: |-
-    <source>
-      @type forward
-      bind 0.0.0.0
-      port 24284
-      shared_key 
-    </source>
-
-    <match **>
-      @type stdout
-    </match>
 ---
 # Source: isdargo/charts/minio/templates/configmap.yaml
 apiVersion: v1
@@ -12207,11 +12067,9 @@ data:
     OESGATE=$(grep oes-gate /tmp/live.status | awk '{print $2}')
     OESUI=$(grep oes-ui /tmp/live.status | awk '{print $2}')
     OESPLATFORM=$(grep oes-platform /tmp/live.status | awk '{print $2}')
-    ELASTICSEARCH=$(grep elasticsearch-master /tmp/live.status | awk '{print $2}')
-    KIBANA=$(grep kibana /tmp/live.status | awk '{print $2}')
     PROMETHEUS=$(grep prometheus-server /tmp/live.status | awk '{print $2}')
     wait_period=$(($wait_period+10))
-    if [ "$ELASTICSEARCH" == "true" ] && [ "$KIBANA" == "true" ] && [ "$PROMETHEUS" == "true" ] && [ "$OESPLATFORM" == "true" ] && [ "$OESUI" == "true" ] && [ "$OESGATE" == "true" ] && [ "$ARGOCDSERVER" == "true" ] && [ "$validate" == "200" ] && [ "$OESSAPOR" == "true" ];
+    if [ "$PROMETHEUS" == "true" ] && [ "$OESPLATFORM" == "true" ] && [ "$OESUI" == "true" ] && [ "$OESGATE" == "true" ] && [ "$ARGOCDSERVER" == "true" ] && [ "$validate" == "200" ] && [ "$OESSAPOR" == "true" ];
     then
       echo \"ArgocdServer is  Up and Ready..\"
       while true
@@ -12240,11 +12098,11 @@ data:
 
       else
          encodedtoken=$(echo -n $token | base64 -w0)
-         ### Create Datasource 
-       ## create Elasticsearch datasource
+         ### Create Datasource
+         ## create sample SPLUNK integraton
        curl --location --request POST 'http://oes-platform:8095/platformservice/v6/datasource' \
        --header 'Content-Type: application/json' \
-       --data-raw '{"datasourceType":"ELASTICSEARCH","name":"opsmx-elastic","configurationFields":{"endPoint":"http://elasticsearch-master:9200","username":"","password":"","kibanaEndPoint":"http://isd-kibana:5601","kibanaUsername":"","kibanaPassword":""}}'
+       --data-raw '{"datasourceType":"SPLUNK","name":"sample-splunk","configurationFields":{"end_point":"http://demosplunk.in","user_name":"","password":"","dashboard_endpoint":""}}'
        ## Create prometheus datasource
        curl --location --request POST 'http://oes-platform:8095/platformservice/v6/datasource' \
        --header 'Content-Type: application/json' \
@@ -29268,24 +29126,6 @@ rules:
       - list
       - watch
 ---
-# Source: isdargo/charts/fluent-bit/templates/cluster-role.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app: fluent-bit
-    chart: fluent-bit-2.8.2
-    heritage: Helm
-    release: isd
-  name: isd-fluent-bit
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - get
----
 # Source: isdargo/charts/prometheus/templates/alertmanager/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -29448,25 +29288,6 @@ subjects:
 - kind: ServiceAccount
   name: isd-argo-rollouts-dashboard
   namespace: opsmx-argo
----
-# Source: isdargo/charts/fluent-bit/templates/cluster-rolebinding.yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app: fluent-bit
-    chart: fluent-bit-2.8.2
-    heritage: Helm
-    release: isd
-  name: isd-fluent-bit
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: isd-fluent-bit
-subjects:
-  - kind: ServiceAccount
-    name: isd-fluent-bit
-    namespace: opsmx-argo
 ---
 # Source: isdargo/charts/prometheus/templates/alertmanager/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30238,77 +30059,6 @@ spec:
     app.kubernetes.io/name: argo-rollouts
     app.kubernetes.io/instance: isd
 ---
-# Source: isdargo/charts/elasticsearch/templates/service.yaml
-kind: Service
-apiVersion: v1
-metadata:
-  name: elasticsearch-master
-  labels:
-    heritage: "Helm"
-    release: "isd"
-    chart: "elasticsearch"
-    app: "elasticsearch-master"
-  annotations:
-    {}
-spec:
-  type: ClusterIP
-  selector:
-    heritage: "Helm"
-    release: "isd"
-    chart: "elasticsearch"
-    app: "elasticsearch-master"
-  ports:
-  - name: http
-    protocol: TCP
-    port: 9200
-  - name: transport
-    protocol: TCP
-    port: 9300
----
-# Source: isdargo/charts/elasticsearch/templates/service.yaml
-kind: Service
-apiVersion: v1
-metadata:
-  name: elasticsearch-master-headless
-  labels:
-    heritage: "Helm"
-    release: "isd"
-    chart: "elasticsearch"
-    app: "elasticsearch-master"
-  annotations:
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-spec:
-  clusterIP: None # This is needed for statefulset hostnames like elasticsearch-0 to resolve
-  # Create endpoints also if the related pod isn't ready
-  publishNotReadyAddresses: true
-  selector:
-    app: "elasticsearch-master"
-  ports:
-  - name: http
-    port: 9200
-  - name: transport
-    port: 9300
----
-# Source: isdargo/charts/kibana/templates/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: isd-kibana
-  labels:
-    app: kibana
-    release: "isd"
-    heritage: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 5601
-      protocol: TCP
-      name: http
-      targetPort: 5601
-  selector:
-    app: kibana
-    release: "isd"
----
 # Source: isdargo/charts/minio/templates/service.yaml
 apiVersion: v1
 kind: Service
@@ -30855,77 +30605,6 @@ spec:
     app: oes
     component: rabbitmq
   type: ClusterIP
----
-# Source: isdargo/charts/fluent-bit/templates/daemonset.yaml
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: isd-fluent-bit
-  labels:
-    app: fluent-bit
-    chart: fluent-bit-2.8.2
-    heritage: Helm
-    release: isd
-spec:
-  selector:
-    matchLabels:
-      app: fluent-bit
-      release: isd
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        app: fluent-bit
-        release: isd
-      annotations:
-        checksum/config: a3a6144fb5c4912e804548009fab08e277dcff3a1d4409af2190535968078ae0
-    spec:
-      hostNetwork: false
-      dnsPolicy: ClusterFirst
-      serviceAccountName: isd-fluent-bit
-      containers:
-      - name: fluent-bit
-        image: "fluent/fluent-bit:1.3.2"
-        imagePullPolicy: "Always"
-        env:
-          []
-        resources:
-          {}
-        volumeMounts:
-        - name: varlog
-          mountPath: /var/log
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-        - name: config
-          mountPath: /fluent-bit/etc/fluent-bit.conf
-          subPath: fluent-bit.conf
-        - name: config
-          mountPath: /fluent-bit/etc/fluent-bit-service.conf
-          subPath: fluent-bit-service.conf
-        - name: config
-          mountPath: /fluent-bit/etc/fluent-bit-input.conf
-          subPath: fluent-bit-input.conf
-        - name: config
-          mountPath: /fluent-bit/etc/fluent-bit-filter.conf
-          subPath: fluent-bit-filter.conf
-        - name: config
-          mountPath: /fluent-bit/etc/fluent-bit-output.conf
-          subPath: fluent-bit-output.conf
-
-      terminationGracePeriodSeconds: 10
-      
-      volumes:
-      - name: varlog
-        hostPath:
-          path: /var/log
-      - name: varlibdockercontainers
-        hostPath:
-          path: /var/lib/docker/containers
-      - name: config
-        configMap:
-          name: isd-fluent-bit-config
 ---
 # Source: isdargo/charts/prometheus/templates/node-exporter/daemonset.yaml
 apiVersion: apps/v1
@@ -31705,98 +31384,6 @@ spec:
           {}
       securityContext:
         runAsNonRoot: true
----
-# Source: isdargo/charts/kibana/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: isd-kibana
-  labels:
-    app: kibana
-    release: "isd"
-spec:
-  replicas: 1
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      app: kibana
-      release: "isd"
-  template:
-    metadata:
-      labels:
-        app: kibana
-        release: "isd"
-      annotations:
-        
-    spec:
-      securityContext:
-        fsGroup: 1000
-      volumes:
-      containers:
-      - name: kibana
-        securityContext:
-          capabilities:
-            drop:
-            - ALL
-          runAsNonRoot: true
-          runAsUser: 1000
-        image: "docker.elastic.co/kibana/kibana:7.5.0"
-        imagePullPolicy: "IfNotPresent"
-        env:
-          - name: ELASTICSEARCH_HOSTS
-            value: "http://elasticsearch-master:9200"
-          - name: SERVER_HOST
-            value: "0.0.0.0"
-        readinessProbe:
-          failureThreshold: 3
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          successThreshold: 3
-          timeoutSeconds: 5
-          exec:
-            command:
-              - sh
-              - -c
-              - |
-                #!/usr/bin/env bash -e
-                http () {
-                    local path="${1}"
-                    set -- -XGET -s --fail
-
-                    if [ -n "${ELASTICSEARCH_USERNAME}" ] && [ -n "${ELASTICSEARCH_PASSWORD}" ]; then
-                      set -- "$@" -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}"
-                    fi
-
-                    STATUS=$(curl --output /dev/null --write-out "%{http_code}" -k "$@" "http://localhost:5601${path}")
-                    if [[ "${STATUS}" -eq 200 ]]; then
-                      exit 0
-                    fi
-
-                    echo "Error: Got HTTP code ${STATUS} but expected a 200"
-                    exit 1
-                }
-
-                http "/app/kibana"
-        ports:
-        - containerPort: 5601
-        lifecycle:
-          postStart:
-            exec:
-              command:
-              - bash
-              - -c
-              - "until curl localhost:5601; do echo \"Waiting for Kibana to be available...\";
-                sleep 5; done; until curl elasticsearch-master:9200; do echo \"Waiting for Elasticsearch
-                to be available...\"; sleep 5; done; sleep 60; curl https://raw.githubusercontent.com/OpsMx/enterprise-argo/main/scripts/kibana/kibana_objects.ndjson
-                > /tmp/kibana_objects.ndjson; curl -X POST \"localhost:5601/api/saved_objects/_import?overwrite=true\"
-                -H \"kbn-xsrf: true\" --form file=@/tmp/kibana_objects.ndjson 2>&1 1> /tmp/postStart.out;
-                \ \n"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 250Mi
-        volumeMounts:
 ---
 # Source: isdargo/charts/minio/templates/deployment.yaml
 apiVersion: apps/v1
@@ -33276,157 +32863,6 @@ spec:
           optional: true
           secretName: argocd-repo-server-tls
 ---
-# Source: isdargo/charts/elasticsearch/templates/statefulset.yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: elasticsearch-master
-  labels:
-    heritage: "Helm"
-    release: "isd"
-    chart: "elasticsearch"
-    app: "elasticsearch-master"
-  annotations:
-    esMajorVersion: "7"
-spec:
-  serviceName: elasticsearch-master-headless
-  selector:
-    matchLabels:
-      app: "elasticsearch-master"
-  replicas: 1
-  podManagementPolicy: Parallel
-  updateStrategy:
-    type: RollingUpdate
-  volumeClaimTemplates:
-  - metadata:
-      name: elasticsearch-master
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 30Gi
-  template:
-    metadata:
-      name: "elasticsearch-master"
-      labels:
-        heritage: "Helm"
-        release: "isd"
-        chart: "elasticsearch"
-        app: "elasticsearch-master"
-        app: "elasticsearch-master"
-      annotations:
-        
-    spec:
-      securityContext:
-        fsGroup: 1000
-        runAsUser: 1000
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - "elasticsearch-master"
-            topologyKey: kubernetes.io/hostname
-      terminationGracePeriodSeconds: 120
-      volumes:
-      initContainers:
-      - name: configure-sysctl
-        securityContext:
-          runAsUser: 0
-          privileged: true
-        image: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"
-        imagePullPolicy: "IfNotPresent"
-        command: ["sysctl", "-w", "vm.max_map_count=262144"]
-        resources:
-          {}
-
-      containers:
-      - name: "elasticsearch"
-        securityContext:
-          capabilities:
-            drop:
-            - ALL
-          runAsNonRoot: true
-          runAsUser: 1000
-        image: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"
-        imagePullPolicy: "IfNotPresent"
-        readinessProbe:
-          failureThreshold: 3
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          successThreshold: 3
-          timeoutSeconds: 5
-          exec:
-            command:
-              - sh
-              - -c
-              - |
-                #!/usr/bin/env bash -e
-                # If the node is starting up wait for the cluster to be ready (request params: 'wait_for_status=green&timeout=1s' )
-                # Once it has started only check that the node itself is responding
-                START_FILE=/tmp/.es_start_file
-
-                http () {
-                    local path="${1}"
-                    if [ -n "${ELASTIC_USERNAME}" ] && [ -n "${ELASTIC_PASSWORD}" ]; then
-                      BASIC_AUTH="-u ${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}"
-                    else
-                      BASIC_AUTH=''
-                    fi
-                    curl -XGET -s -k --fail ${BASIC_AUTH} http://127.0.0.1:9200${path}
-                }
-
-                if [ -f "${START_FILE}" ]; then
-                    echo 'Elasticsearch is already running, lets check the node is healthy and there are master nodes available'
-                    http "/_cluster/health?timeout=0s"
-                else
-                    echo 'Waiting for elasticsearch cluster to become cluster to be ready (request params: "wait_for_status=green&timeout=1s" )'
-                    if http "/_cluster/health?wait_for_status=green&timeout=1s" ; then
-                        touch ${START_FILE}
-                        exit 0
-                    else
-                        echo 'Cluster is not yet ready (request params: "wait_for_status=green&timeout=1s" )'
-                        exit 1
-                    fi
-                fi
-        ports:
-        - name: http
-          containerPort: 9200
-        - name: transport
-          containerPort: 9300
-        resources:
-          requests:
-            cpu: 100m
-            memory: 1Gi
-        env:
-          - name: node.name
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: cluster.initial_master_nodes
-            value: "elasticsearch-master-0,"
-          - name: discovery.seed_hosts
-            value: "elasticsearch-master-headless"
-          - name: cluster.name
-            value: "elasticsearch"
-          - name: network.host
-            value: "0.0.0.0"
-          - name: ES_JAVA_OPTS
-            value: "-Xmx1g -Xms1g"
-          - name: node.data
-            value: "true"
-          - name: node.ingest
-            value: "true"
-          - name: node.master
-            value: "true"
-        volumeMounts:
-          - name: "elasticsearch-master"
-            mountPath: /usr/share/elasticsearch/data
----
 # Source: isdargo/charts/redis/templates/redis-master-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
@@ -33688,69 +33124,6 @@ spec:
   sources:
   - web:
       url: https://github.com/OpsMx/rollout-extension/releases/download/v0.3.6/extension.tar
----
-# Source: isdargo/charts/elasticsearch/templates/test/test-elasticsearch-health.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "isd-utvbs-test"
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  containers:
-  - name: "isd-aadul-test"
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"
-    command:
-      - "sh"
-      - "-c"
-      - |
-        #!/usr/bin/env bash -e
-        curl -XGET --fail 'elasticsearch-master:9200/_cluster/health?wait_for_status=green&timeout=1s'
-  restartPolicy: Never
----
-# Source: isdargo/charts/fluent-bit/templates/tests/test.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: isd-fluent-bit-test
-  labels:
-    app: isd-fluent-bit
-    chart: "fluent-bit-2.8.2"
-    heritage: "Helm"
-    release: "isd"
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  initContainers:
-    - name: test-framework
-      image: "dduportal/bats:0.4.0"
-      command:
-      - "bash"
-      - "-c"
-      - |
-        set -ex
-        # copy bats to tools dir
-        cp -R /usr/local/libexec/ /tools/bats/
-      volumeMounts:
-      - mountPath: /tools
-        name: tools
-  containers:
-    - name: isd-test
-      image: "dwdraju/alpine-curl-jq"
-      command: ["/tools/bats/bats", "-t", "/tests/run.sh"]
-      volumeMounts:
-        - mountPath: /tests
-          name: tests
-          readOnly: true
-        - mountPath: /tools
-          name: tools
-  volumes:
-  - name: tests
-    configMap:
-      name: isd-fluent-bit-test
-  - name: tools
-    emptyDir: {}
-  restartPolicy: Never
 ---
 # Source: isdargo/charts/minio/templates/post-install-create-bucket-job.yaml
 apiVersion: batch/v1

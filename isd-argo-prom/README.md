@@ -1,6 +1,6 @@
-# isd-argo-elastic-prom-quick-install 
+# isd-argo-prometheus-quick-install 
 
-**Quick Install for ISD,Argo,Promethues and Elastic Search**.
+**Quick Install for ISD,Argo and Promethues**.
 
 To experience ISD quickly, you can install it and deploy your applications. Note that the instructions below are intended to get you started quickly and try out ISD functionality. This is not suitable for production or any environment where security is a concern.
 To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB RAM each) and kubectl set-up.
@@ -11,7 +11,7 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
 
 - **Apply the yaml files**
 
-      kubectl -n opsmx-argo apply -f https://raw.githubusercontent.com/OpsMx/isd-ap-quick-install/main/isd-argo-prom-elastic/isd-argo-elastic-prom-quick.yaml
+      kubectl -n opsmx-argo apply -f https://raw.githubusercontent.com/OpsMx/isd-ap-quick-install/main/isd-argo-prom/isd-argo-prometheus-quick.yaml
 
    WAIT for about 10-15 min, depending on network speed.
  
@@ -28,7 +28,7 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
 
  - **Access the ISD UI**
       
-     Login using browser with http://localhost:8080  
+     Login using browser with http://localhost:8080
      
      - username **admin**
 
