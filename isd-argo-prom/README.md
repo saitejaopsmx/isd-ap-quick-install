@@ -1,6 +1,6 @@
 # isd-argo-prometheus-quick-install 
 
-**Quick Install for ISD,Argo and Promethues**.
+**Quick Install for ISD,ArgoCD,ArgoRollouts and Promethues**.
 
 To experience ISD quickly, you can install it and deploy your applications. Note that the instructions below are intended to get you started quickly and try out ISD functionality. This is not suitable for production or any environment where security is a concern.
 To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB RAM each) and kubectl set-up.
