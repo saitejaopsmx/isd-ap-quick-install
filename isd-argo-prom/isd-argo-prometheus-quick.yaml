@@ -1,4 +1,9 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opsmx-argo
+---
 # Source: isdargo/charts/argo-cd/templates/argocd-application-controller/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
