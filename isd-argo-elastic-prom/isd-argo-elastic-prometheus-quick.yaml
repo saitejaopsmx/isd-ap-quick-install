@@ -35302,25 +35302,6 @@ spec:
        restartPolicy: Never
        serviceAccount: create-controller-secret
 ---
-# Source: isdargo/charts/elasticsearch/templates/test/test-elasticsearch-health.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "isdargo-tycxy-test"
-  annotations:
-    "helm.sh/hook": test-success
-spec:
-  containers:
-  - name: "isdargo-gasbd-test"
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"
-    command:
-      - "sh"
-      - "-c"
-      - |
-        #!/usr/bin/env bash -e
-        curl -XGET --fail 'elasticsearch-master:9200/_cluster/health?wait_for_status=green&timeout=1s'
-  restartPolicy: Never
----
 # Source: isdargo/charts/fluent-bit/templates/tests/test.yaml
 apiVersion: v1
 kind: Pod
