@@ -11,7 +11,7 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
 
 - **Apply the yaml files**
 
-      kubectl -n opsmx-argo apply -f https://raw.githubusercontent.com/opsmx/isd-ap-quick-install/elasticprom/isd-argo-elastic-prom/isd-argo-elastic-prometheus-quick.yaml
+      kubectl -n opsmx-argo apply -f https://raw.githubusercontent.com/OpsMx/isd-ap-quick-install/main/isd-argo-elastic-prom/isd-argo-elastic-prometheus-quick.yaml
 
    WAIT for about 10-15 min, depending on network speed.
  
