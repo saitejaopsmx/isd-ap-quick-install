@@ -336,7 +336,9 @@ data:
 apiVersion: v1
 stringData:
   carina-manager.yaml: |    
-    httpListenPort: 8090
+    httpListenPort: 8091
+    rbac:
+      httpListenPort: 8092
     controller:
       url: 'https://opsmx-controller-controller1:9003'
       caPath: /app/secrets/controller-ca.crt
@@ -469,7 +471,7 @@ stringData:
     secret.ds.protocol=http://
     secret.ds.url=localhost:5005
     secret.dashboard.url=http://oes-dashboard:8094
-    server.host.dns.name=http://localhost:8080/ui
+    server.host.dns.name=http://localhost:8093/ui
     gate.url=http://oes-gate:8084
     
     #datascience configuration
@@ -1245,7 +1247,7 @@ stringData:
         caCertfile: /opt/opsmx/controller/ca.crt
         certFile: /opt/opsmx/controller/cert/tls.crt
         keyFile: /opt/opsmx/controller/cert/tls.key
-        image: quay.io/opsmxpublic/forwarder-agent:v3.5.7
+        image: quay.io/opsmxpublic/forwarder-agent:v3.5.9
       template:
         path: /opt/opsmx/controller
         kubectlTemplateFileName: kubeconfig.template
@@ -1848,7 +1850,7 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   policy.csv: ""
-  policy.default: ""
+  policy.default: "admin"
   scopes: '[groups]'
 ---
 # Source: isdargo/charts/argo-cd/templates/argocd-configs/argocd-ssh-known-hosts-cm.yaml
@@ -2238,6 +2240,41 @@ data:
     @INCLUDE fluent-bit-output.conf
 
   parsers.conf: |
+---
+# Source: isdargo/charts/fluent-bit/templates/tests/test-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: isdargo-fluent-bit-test
+  labels:
+    app: isdargo-fluent-bit
+    chart: "fluent-bit-2.8.2"
+    heritage: "Helm"
+    release: "isdargo"
+data:
+  run.sh: |-
+    @test "Test Elasticssearch Indices" {
+      url="http://elasticsearch-master:9200/_cat/indices?format=json"
+      body=$(curl $url)
+
+      result=$(echo $body | jq -cr '.[] | select(.index | contains("kubernetes_cluster"))')
+      [ "$result" != "" ]
+
+      result=$(echo $body | jq -cr '.[] | select((.index | contains("kubernetes_cluster")) and (.health != "green"))')
+      [ "$result" == "" ]
+    }
+
+  fluentd.conf: |-
+    <source>
+      @type forward
+      bind 0.0.0.0
+      port 24284
+      shared_key 
+    </source>
+
+    <match **>
+      @type stdout
+    </match>
 ---
 # Source: isdargo/charts/minio/templates/configmap.yaml
 apiVersion: v1
@@ -3574,11 +3611,11 @@ data:
     OESGATE=$(grep oes-gate /tmp/live.status | awk '{print $2}')
     OESUI=$(grep oes-ui /tmp/live.status | awk '{print $2}')
     OESPLATFORM=$(grep oes-platform /tmp/live.status | awk '{print $2}')
-    ELASTICSEARCH=$(grep elasticsearch-master /tmp/live.status | awk '{print $2}')
+    ELASTICSEARCH=$(grep elasticsearch-master-0 /tmp/live.status | awk '{print $2}')
     KIBANA=$(grep kibana /tmp/live.status | awk '{print $2}')
     PROMETHEUS=$(grep prometheus-server /tmp/live.status | awk '{print $2}')
     wait_period=$(($wait_period+10))
-    if  [ "$OESPLATFORM" == "true" ] && [ "$OESUI" == "true" ] && [ "$OESGATE" == "true" ] && [ "$ARGOCDSERVER" == "true" ] && [ "$validate" == "200" ] && [ "$OESSAPOR" == "true" ];
+      if [ "$ELASTICSEARCH" == "true" ] && [ "$KIBANA" == "true" ] && [ "$PROMETHEUS" == "true" ] && [ "$OESPLATFORM" == "true" ] && [ "$OESUI" == "true" ] && [ "$OESGATE" == "true" ] && [ "$ARGOCDSERVER" == "true" ] && [ "$validate" == "200" ] && [ "$OESSAPOR" == "true" ];
     then
       echo \"ArgocdServer is  Up and Ready..\"
       while true
@@ -33524,7 +33561,7 @@ spec:
         release: "isdargo"
         chart: "isdargo-4.1.1"
       annotations:
-        checksum/secret: 3317d0843d09e8e86afa45102c110412f46f8d4715da5fdf1208733b21c1ff37
+        checksum/secret: fded78fb79f163122ee7400d331e474f1421c46e7b26570ece98a6ef0c014ddc
     spec:
       containers:
       - image: quay.io/opsmxpublic/carina-instance:v1.9.2
@@ -33575,7 +33612,7 @@ spec:
         release: "isdargo"
         chart: "isdargo-4.1.1"
       annotations:
-        checksum/secret: 3317d0843d09e8e86afa45102c110412f46f8d4715da5fdf1208733b21c1ff37
+        checksum/secret: fded78fb79f163122ee7400d331e474f1421c46e7b26570ece98a6ef0c014ddc
     spec:
       containers:
       - image: quay.io/opsmxpublic/carina-manager:v1.9.2
@@ -33651,7 +33688,7 @@ spec:
     spec:
       containers:
       - name: opsmx-controller-controller1
-        image: quay.io/opsmxpublic/forwarder-controller:v3.5.7
+        image: quay.io/opsmxpublic/forwarder-controller:v3.5.9
         ports:
           - containerPort: 9001
             name: agent-grpc
