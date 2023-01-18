@@ -1,8 +1,12 @@
----
 apiVersion: v1
 kind: Namespace
 metadata:
   name: opsmx-argo
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argo-sampleapp
 ---
 # Source: isdargo/charts/elasticsearch/templates/poddisruptionbudget.yaml
 apiVersion: policy/v1beta1
@@ -1370,9 +1374,8 @@ apiVersion: v1
 data:
   name: b3BzbXgtc2FtcGxlcw==
   project: b3BzbXhwcm9qCg==
-  sshPrivateKey: LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUFNd0FBQUF0emMyZ3RaVwpReU5UVXhPUUFBQUNETi96S2oyU2szTXdEN1c4V3o4S1JDdGJEOWIvZGw0NWN1TE5SOHdzTmNWd0FBQUppbEd3VCtwUnNFCi9nQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDRE4vektqMlNrM013RDdXOFd6OEtSQ3RiRDliL2RsNDVjdUxOUjh3c05jVncKQUFBRUFQUFlGQUdCMlpsWWloNitrWXF5dE1XcFdEUml5b3U5U0t4T3pDWUk3c1E4My9NcVBaS1RjekFQdGJ4YlB3cEVLMQpzUDF2OTJYamx5NHMxSHpDdzF4WEFBQUFFMnR6Y21sdWFXMWlZVUJuYldGcGJDNWpiMjBCQWc9PQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K
   type: Z2l0
-  url: Z2l0QGdpdGh1Yi5jb206T3BzTXgvYXJnby1zYW1wbGUtYXBwcy5naXQ=
+  url: aHR0cHM6Ly9naXRodWIuY29tL29wc214L2lzZC1zYW1wbGUtYXBwcy5naXQ=
 kind: Secret
 metadata:
   annotations:
@@ -1453,6 +1456,17 @@ metadata:
     heritage: "Helm"
     release: "isdargo"
     chart: "isdargo-4.1.1"
+---
+# Source: isdargo/templates/secrets/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argo-workflows-sso
+data:
+  # client-id is 'argo-workflows-sso'
+  client-id: YXJnby13b3JrZmxvd3Mtc3Nv
+  # client-secret is 'MY-SECRET-STRING-CAN-BE-UUID'
+  client-secret: b3BzbXhAMTIz
 ---
 # Source: isdargo/charts/argo-cd/templates/argocd-configs/argocd-cm.yaml
 apiVersion: v1
@@ -2224,41 +2238,6 @@ data:
     @INCLUDE fluent-bit-output.conf
 
   parsers.conf: |
----
-# Source: isdargo/charts/fluent-bit/templates/tests/test-configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: isdargo-fluent-bit-test
-  labels:
-    app: isdargo-fluent-bit
-    chart: "fluent-bit-2.8.2"
-    heritage: "Helm"
-    release: "isdargo"
-data:
-  run.sh: |-
-    @test "Test Elasticssearch Indices" {
-      url="http://elasticsearch-master:9200/_cat/indices?format=json"
-      body=$(curl $url)
-
-      result=$(echo $body | jq -cr '.[] | select(.index | contains("kubernetes_cluster"))')
-      [ "$result" != "" ]
-
-      result=$(echo $body | jq -cr '.[] | select((.index | contains("kubernetes_cluster")) and (.health != "green"))')
-      [ "$result" == "" ]
-    }
-
-  fluentd.conf: |-
-    <source>
-      @type forward
-      bind 0.0.0.0
-      port 24284
-      shared_key 
-    </source>
-
-    <match **>
-      @type stdout
-    </match>
 ---
 # Source: isdargo/charts/minio/templates/configmap.yaml
 apiVersion: v1
@@ -3599,7 +3578,7 @@ data:
     KIBANA=$(grep kibana /tmp/live.status | awk '{print $2}')
     PROMETHEUS=$(grep prometheus-server /tmp/live.status | awk '{print $2}')
     wait_period=$(($wait_period+10))
-    if [ "$ELASTICSEARCH" == "true" ] && [ "$KIBANA" == "true" ] && [ "$PROMETHEUS" == "true" ] && [ "$OESPLATFORM" == "true" ] && [ "$OESUI" == "true" ] && [ "$OESGATE" == "true" ] && [ "$ARGOCDSERVER" == "true" ] && [ "$validate" == "200" ] && [ "$OESSAPOR" == "true" ];
+    if  [ "$OESPLATFORM" == "true" ] && [ "$OESUI" == "true" ] && [ "$OESGATE" == "true" ] && [ "$ARGOCDSERVER" == "true" ] && [ "$validate" == "200" ] && [ "$OESSAPOR" == "true" ];
     then
       echo \"ArgocdServer is  Up and Ready..\"
       while true
@@ -32826,6 +32805,11 @@ spec:
         args:
         - rundex
         env:
+          - name: ARGO_WORKFLOWS_SSO_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: client-secret
+                name: argo-workflows-sso
           - name: ARGOCD_DEX_SERVER_DISABLE_TLS
             valueFrom:
               configMapKeyRef:
@@ -32954,7 +32938,7 @@ spec:
       app.kubernetes.io/instance: isdargo
   strategy:
     type: Recreate
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       annotations:
@@ -33667,7 +33651,7 @@ spec:
     spec:
       containers:
       - name: opsmx-controller-controller1
-        image: quay.io/opsmxpublic/forwarder-controller:v3.5.9
+        image: quay.io/opsmxpublic/forwarder-controller:v3.5.7
         ports:
           - containerPort: 9001
             name: agent-grpc
@@ -35430,15 +35414,15 @@ metadata:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-delete-policy": "before-hook-creation"
     "helm.sh/hook-weight": "13"
-  name: app-of-apps
+  name: app-of-app
 spec:
   destination:
     name: in-cluster
     namespace: opsmx-argo
     server: ''
   source:
-    path: sampleapps-opsmxproj
-    repoURL: 'git@github.com:OpsMx/argo-sample-apps.git'
+    path: sampleapps
+    repoURL: 'https://github.com/opsmx/isd-sample-apps.git'
     targetRevision: HEAD
   project: opsmxproj
   syncPolicy:
