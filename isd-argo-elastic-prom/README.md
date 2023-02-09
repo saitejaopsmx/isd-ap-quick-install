@@ -23,7 +23,7 @@ To begin installation, you'll need a Kubernetes cluster  (with 2 nodes with 32GB
 
      Once all pods show "Running" or "Completed" status, execute below command
        
-       kubectl -n opsmx-argo port-forward svc/oes-ui 8093 & kubectl -n opsmx-argo port-forward svc/isd-argocd-server 8099:80
+       kubectl -n opsmx-argo port-forward svc/oes-ui 8093 & kubectl -n opsmx-argo port-forward svc/isdargo-argocd-server 8099:80
       
 
  - **Access the ISD UI**
